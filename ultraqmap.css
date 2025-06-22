@@ -28,6 +28,17 @@
             gap: 15px;
         }
 
+        /* For the email link */
+        .header-content a {
+            color: rgb(208,113,38); /* Orange color */
+            text-decoration: none; 
+        }
+
+        /* Change color on hover */
+        .header-content a:hover {
+            color: rgb(220,134,65); /* Lighter orange on hover */
+        }
+
         .header-logo {
             height: 35px;
             width: auto;
