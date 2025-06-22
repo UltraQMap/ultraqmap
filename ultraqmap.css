@@ -29,14 +29,9 @@
         }
 
         /* For the email link */
-        .header-content a {
+        .header-content h3 {
             color: rgb(208,113,38);
             text-decoration: none; 
-        }
-
-        /* Change color on hover */
-        .header-content a:hover {
-            color: rgb(220,134,65); /* Lighter orange on hover */
         }
 
         .header-logo {
