@@ -76,7 +76,7 @@ var iconMap = {
 
 // Load shows data from JSON file
 function loadShowsData() {
-    fetch('UQ_shows.json') // Path to your JSON file
+    fetch('UQ_shows.json')
         .then(response => response.json())
         .then(data => {
             data.forEach(show => {
