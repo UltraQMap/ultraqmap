@@ -65,13 +65,13 @@ var ShowIcon = L.Icon.extend({
 });
 
 var iconMap = {
-    2019: new ShowIcon({iconUrl: "/MapMarkers/2019_marker2.png"}),
-    2020: new ShowIcon({iconUrl: "/MapMarkers/2020_marker2.png"}),
-    2021: new ShowIcon({iconUrl: "/MapMarkers/2021_marker2.png"}),
-    2022: new ShowIcon({iconUrl: "/MapMarkers/2022_marker2.png"}),
-    2023: new ShowIcon({iconUrl: "/MapMarkers/2023_marker2.png"}),
-    2024: new ShowIcon({iconUrl: "/MapMarkers/2024_marker2.png"}),
-    2025: new ShowIcon({iconUrl: "/MapMarkers/2025_marker2.png"})
+    2019: new ShowIcon({iconUrl: "MapMarkers/2019_marker2.png"}),
+    2020: new ShowIcon({iconUrl: "MapMarkers/2020_marker2.png"}),
+    2021: new ShowIcon({iconUrl: "MapMarkers/2021_marker2.png"}),
+    2022: new ShowIcon({iconUrl: "MapMarkers/2022_marker2.png"}),
+    2023: new ShowIcon({iconUrl: "MapMarkers/2023_marker2.png"}),
+    2024: new ShowIcon({iconUrl: "MapMarkers/2024_marker2.png"}),
+    2025: new ShowIcon({iconUrl: "MapMarkers/2025_marker2.png"})
 };
 
 // Load shows data from JSON file
