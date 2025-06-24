@@ -62,6 +62,20 @@
             flex-shrink: 0;
         }
 
+
+    .leaflet-popup-content {
+        font-family: 'Changa', sans-serif;
+        font-size: 14px;
+        color: #333;
+        margin: 8px 12px; 
+    }
+
+    .leaflet-popup-content b {
+        font-weight: bold;
+        color: #000;
+    }
+
+
     /* Reset view button */
     .custom-button {
         background-color: rgba(255, 255, 255);
