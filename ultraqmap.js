@@ -43,7 +43,19 @@ L.control.scale({
 
 // Splash screen
 document.addEventListener("DOMContentLoaded", function () {
+    // Existing code for the "Explore the Map" button
     document.getElementById("accept-splash").addEventListener("click", function () {
+        document.getElementById("splash-modal").classList.add("hidden");
+        
+        // Add a small timeout to ensure CSS transitions complete
+        setTimeout(() => {
+            // Force a map resize to fix rendering issues
+            mymap.invalidateSize();
+        }, 300);
+    });
+
+    // New code for the close button (X)
+    document.getElementById("close-splash").addEventListener("click", function () {
         document.getElementById("splash-modal").classList.add("hidden");
         
         // Add a small timeout to ensure CSS transitions complete
