@@ -196,13 +196,12 @@ footer {
     
     /* Adjust minimap position to avoid being cut off */
     .leaflet-control-minimap {
-        bottom: 40px !important;
         margin-bottom: 10px;
     }
     
     /* Ensure scale bar has space */
     .leaflet-control-scale {
-        bottom: 10px !important;
+        bottom: 10px;
     }    
 }
 
