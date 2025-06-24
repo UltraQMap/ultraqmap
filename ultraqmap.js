@@ -54,8 +54,20 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+// ========== GLOBAL VARIABLES ========== //
+var markersByYear = {};
+var visibleYears = new Set();
 
-// DONUT CLUSTER ICONS
+const yearColors = {
+    '2019': '#23bdb4ff',
+    '2020': '#23bd66ff',
+    '2021': '#bdb423ff',
+    '2022': '#bd237aff',
+    '2023': '#bd232dff',
+    '2024': '#bd6623ff',
+    '2025': '#237abdff'
+};
+
 // Custom map marker icons
 var ShowIcon = L.Icon.extend({
     options: {
@@ -99,13 +111,13 @@ function createClusterIcon(cluster) {
     
     // Color scheme for years
     var colors = {
-        '2019': '#1b928bff',
-        '2020': '#1b924fff',
-        '2021': '#928b1bff',
+        '2019': '#23bdb4ff',
+        '2020': '#23bd66ff',
+        '2021': '#bdb423ff',
         '2022': '#bd237aff',
-        '2023': '#921b23ff',
-        '2024': '#924f1bff',
-        '2025': '#1b5e92ff'
+        '2023': '#bd232dff',
+        '2024': '#bd6623ff',
+        '2025': '#237abdff'
     };
     
     // Check if all markers are from the same year
@@ -163,15 +175,20 @@ var markerClusterGroup = L.markerClusterGroup({
     iconCreateFunction: createClusterIcon
 }).addTo(mymap);
 
-// Load show markers
+// ========== FILTERING FUNCTIONS ========== //
 function loadShowsData() {
+    // Initialize years object
+    Object.keys(iconMap).forEach(year => {
+        markersByYear[year] = [];
+    });
+
     fetch('UQ_shows.json')
         .then(response => response.json())
         .then(data => {
             data.forEach(show => {
                 const yearStr = show.Year.toString();
-                const icon = iconMap[show.Year] || iconMap[2019];
-
+                const icon = iconMap[yearStr] || iconMap[2019];
+                
                 const marker = L.marker([show.Latitude, show.Longitude], { icon: icon });
                 
                 // Add feature properties
@@ -188,10 +205,75 @@ function loadShowsData() {
                 `;
                 marker.bindPopup(popupContent);
 
-                markerClusterGroup.addLayer(marker);
+                // Store marker by year
+                if (markersByYear[yearStr]) {
+                    markersByYear[yearStr].push(marker);
+                    markerClusterGroup.addLayer(marker);
+                    visibleYears.add(yearStr);
+                }
             });
+
+            // Create year filter control AFTER data loads
+            createYearControl();
         })
         .catch(error => console.error('Error loading shows data:', error));
+}
+
+// Create year filter control
+function createYearControl() {
+    const container = document.getElementById('year-control');
+    container.innerHTML = '<strong>Year & Show Count</strong>';
+    
+    Object.keys(markersByYear)
+        .sort()
+        .forEach(year => {
+            if (markersByYear[year].length > 0) {
+                const label = document.createElement('label');
+                
+                // Create checkbox
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = true;
+                checkbox.value = year;
+                
+                // Create color indicator
+                const colorIndicator = document.createElement('span');
+                colorIndicator.className = `year-color year-${year}`;
+                colorIndicator.style.backgroundColor = yearColors[year];
+                
+                // Create text
+                const text = document.createTextNode(`${year} (${markersByYear[year].length})`);
+                
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        visibleYears.add(year);
+                    } else {
+                        visibleYears.delete(year);
+                    }
+                    updateVisibleMarkers();
+                });
+                
+                label.appendChild(checkbox);
+                label.appendChild(colorIndicator);
+                label.appendChild(text);
+                container.appendChild(label);
+            }
+        });
+}
+
+// Update visible markers based on selected years
+function updateVisibleMarkers() {
+    // Remove all markers first
+    markerClusterGroup.clearLayers();
+    
+    // Add back markers for visible years
+    Object.keys(markersByYear).forEach(year => {
+        if (visibleYears.has(year)) {
+            markersByYear[year].forEach(marker => {
+                markerClusterGroup.addLayer(marker);
+            });
+        }
+    });
 }
 
 // Initialize when DOM is loaded

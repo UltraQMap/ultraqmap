@@ -85,6 +85,56 @@ footer {
     color: #000;
 }
 
+/* Checkbox controls */
+#year-control {
+    position: absolute;
+    top: 70px; 
+    right: 10px;
+    z-index: 1000; 
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    font-family: 'Changa', sans-serif;
+    max-height: 70vh;
+    overflow-y: auto;
+    max-width: 200px;
+}
+
+#year-control label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.year-color {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.year-2019 { background-color: #23bdb4ff; }
+.year-2020 { background-color: #23bd66ff; }
+.year-2021 { background-color: #bdb423ff; }
+.year-2022 { background-color: #bd237aff; }
+.year-2023 { background-color: #bd232dff; }
+.year-2024 { background-color: #bd6623ff; }
+.year-2025 { background-color: #237abdff; }
+
+#year-control input:checked + .year-color {
+    transform: scale(1.3);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+#year-control input {
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+
 /* Reset view button */
 .custom-button {
     background-color: rgba(255, 255, 255);
@@ -201,6 +251,13 @@ footer {
     .leaflet-control-scale {
         bottom: 10px;
     }    
+    #year-control {
+        top: 140px;
+        right: 5px;
+        max-width: 150px;
+        padding: 8px;
+        font-size: 14px;
+    }
 }
 
 .leaflet-bottom {
