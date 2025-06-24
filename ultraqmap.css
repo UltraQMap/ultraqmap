@@ -193,12 +193,11 @@ footer {
 }
 .splash-content h1 {
     color: rgb(11, 59, 56);
-    margin-bottom: 0;
     font-family: "Changa", sans-serif;
 }
 .splash-text {
     text-align: center;
-    margin-top: 0;
+    margin-top: 1rem;
     margin-bottom: 2rem;
     line-height: 1.8;
     font-family: "Changa", sans-serif;
