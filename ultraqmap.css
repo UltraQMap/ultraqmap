@@ -194,12 +194,10 @@ footer {
         font-size: 1.8rem;
     }
     
-    /* Adjust minimap position to avoid being cut off */
     .leaflet-control-minimap {
         margin-bottom: 10px;
     }
     
-    /* Ensure scale bar has space */
     .leaflet-control-scale {
         bottom: 10px;
     }    
