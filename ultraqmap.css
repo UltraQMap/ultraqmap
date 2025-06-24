@@ -27,6 +27,8 @@
             align-items: center;
             gap: 15px;
             line-height: 1;
+            padding-top: 5px;
+            padding-bottom: 5px;
         }
 
         /* For the email link */
@@ -58,10 +60,10 @@
         footer {
             background-color: rgb(11,59,56);
             color: white;
-            padding: 5px;
+            padding-top: 5px;
             text-align: center;
             flex-shrink: 0;
-            line-height: 1;
+            line-height: 1.5;
         }
 
 
