@@ -67,11 +67,29 @@ h1 {
 footer {
     background-color: rgb(11, 59, 56);
     color: white;
-    padding-top: 5px;
+    padding: 5px;
     text-align: center;
     flex-shrink: 0;
-    line-height: 1.5;
+    line-height: 1;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
 }
+
+footer a {
+    color: #da7f39ff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+footer a:hover {
+    color: #e29b64ff; 
+}
+
 
 .leaflet-popup-content {
     font-family: "Changa", sans-serif;
