@@ -168,3 +168,29 @@ footer {
 #accept-splash:hover {
     background-color: rgb(17, 92, 87);
 }
+
+/* Mobile compatability */
+@media (max-width: 768px) {
+    body {
+        height: 100%;
+        min-height: -webkit-fill-available; /* For mobile browsers */
+    }
+    
+    #map-container {
+        height: calc(100vh - 120px); /* Account for header/footer */
+    }
+    
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 5px;
+    }
+    
+    .header-logo {
+        height: 30px;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+    }
+}
