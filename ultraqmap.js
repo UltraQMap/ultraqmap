@@ -45,7 +45,12 @@ L.control.scale({
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("accept-splash").addEventListener("click", function () {
         document.getElementById("splash-modal").classList.add("hidden");
-        document.getElementById("map").classList.remove("inactive");
+        
+        // Add a small timeout to ensure CSS transitions complete
+        setTimeout(() => {
+            // Force a map resize to fix rendering issues
+            mymap.invalidateSize();
+        }, 300);
     });
 });
 

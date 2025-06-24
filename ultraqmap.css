@@ -33,8 +33,6 @@ header {
     display: flex;
     align-items: center;
     gap: 15px;
-    line-height: 1;
-    padding: 5px;
 }
 
 /* For the email link */
@@ -50,13 +48,15 @@ header {
 
 h1 {
     font-size: 2.2rem;
-    margin: 0;
+    line-height: 1;
+    padding: 5px;
 }
 
 #map-container {
     flex-grow: 1;
     position: relative;
-    min-height: 0; 
+    min-height: 0;
+    overflow: hidden; /* Prevent any overflow issues */
 }
 
 #map {
@@ -170,7 +170,7 @@ footer {
 }
 
 /* Mobile compatability */
-@media (max-width: 768px) {
+@media (max-width: 600px) {
     body {
         height: 100%;
         min-height: -webkit-fill-available; /* For mobile browsers */
@@ -193,4 +193,19 @@ footer {
     h1 {
         font-size: 1.8rem;
     }
+    
+    /* Adjust minimap position to avoid being cut off */
+    .leaflet-control-minimap {
+        bottom: 40px !important;
+        margin-bottom: 10px;
+    }
+    
+    /* Ensure scale bar has space */
+    .leaflet-control-scale {
+        bottom: 10px !important;
+    }    
+}
+
+.leaflet-bottom {
+    padding-bottom: 10px;
 }
