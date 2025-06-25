@@ -2938,5 +2938,65 @@
    "Month": "August",
    "Day": 2,
    "Year": 2025
+ },
+ {
+   "ID": 246,
+   "Country": "USA",
+   "State": "California",
+   "City": "Berkeley",
+   "Venue": "Thorsen House",
+   "Latitude": 37.86913549,
+   "Longitude": -122.2517517,
+   "Month": "April",
+   "Day": 15,
+   "Year": 2022
+ },
+ {
+   "ID": 247,
+   "Country": "USA",
+   "State": "California",
+   "City": "Berkeley",
+   "Venue": "Thorsen House",
+   "Latitude": 37.86913549,
+   "Longitude": -122.2517517,
+   "Month": "April",
+   "Day": 16,
+   "Year": 2022
+ },
+ {
+   "ID": 248,
+   "Country": "USA",
+   "State": "California",
+   "City": "San Francisco",
+   "Venue": "Bottom of the Hill",
+   "Latitude": 37.76505165,
+   "Longitude": -122.3964187,
+   "Month": "September",
+   "Day": 10,
+   "Year": 2022
+ },
+ {
+   "ID": 249,
+   "Country": "USA",
+   "State": "California",
+   "City": "Long Beach",
+   "Venue": "Fingerprints",
+   "Latitude": 33.82722557,
+   "Longitude": -118.1853654,
+   "Month": "July",
+   "Day": 2,
+   "Year": 2023
+ },
+ {
+   "ID": 250,
+   "Country": "USA",
+   "State": "California",
+   "City": "Oakland",
+   "Venue": "Bandcamp",
+   "Latitude": 37.80798629,
+   "Longitude": -122.269151,
+   "Month": "July",
+   "Day": 13,
+   "Year": 2023
  }
 ]
