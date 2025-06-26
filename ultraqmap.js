@@ -2,9 +2,10 @@
 var mymap = L.map("map").setView([38, -40], 3);
 
 // Add basemaps
-var streets = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
+var streets = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: "abcd",
     maxZoom: 20
 }).addTo(mymap);
 
@@ -25,45 +26,79 @@ var ZoomOutControl = L.Control.extend({
 new ZoomOutControl().addTo(mymap);
 
 // Create locator (inset) map
-var miniMap = new L.Control.MiniMap(
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"),
-    {
-        toggleDisplay: true,
-        position: "bottomright",
-        zoomLevelOffset: -5
-    }
-).addTo(mymap);
+var miniMap = new L.Control.MiniMap(L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"), {
+    toggleDisplay: true,
+    position: "bottomright",
+    zoomLevelOffset: -5
+}).addTo(mymap);
 
 // Add a scale bar to the map
-L.control.scale({
-    imperial: true,
-    metric: true,
-    position: "bottomleft"
-}).addTo(mymap);
+L.control
+    .scale({
+        imperial: true,
+        metric: true,
+        position: "bottomleft"
+    })
+    .addTo(mymap);
 
 // Splash screen
 document.addEventListener("DOMContentLoaded", function () {
-    // Existing code for the "Explore the Map" button
+    let currentPage = 1;
+    const totalPages = 3;
+
+    function showPage(pageNumber) {
+        // Hide all pages
+        document.querySelectorAll(".splash-page").forEach((page) => {
+            page.classList.remove("active");
+        });
+
+        // Show current page
+        document.getElementById(`page${pageNumber}`).classList.add("active");
+        currentPage = pageNumber;
+
+        // Update button states
+        document.getElementById("prev-page").disabled = currentPage === 1;
+        document.getElementById("next-page").disabled = currentPage === totalPages;
+    }
+
+    // Navigation event listeners
+    document.getElementById("next-page").addEventListener("click", function () {
+        if (currentPage < totalPages) {
+            showPage(currentPage + 1);
+        }
+    });
+
+    document.getElementById("prev-page").addEventListener("click", function () {
+        if (currentPage > 1) {
+            showPage(currentPage - 1);
+        }
+    });
+
+    document.querySelectorAll("#prev-page").forEach((button) => {
+        button.addEventListener("click", function () {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        });
+    });
+
+    // Close splash screen
     document.getElementById("accept-splash").addEventListener("click", function () {
         document.getElementById("splash-modal").classList.add("hidden");
-        
-        // Add a small timeout to ensure CSS transitions complete
         setTimeout(() => {
-            // Force a map resize to fix rendering issues
             mymap.invalidateSize();
         }, 300);
     });
 
-    // New code for the close button (X)
     document.getElementById("close-splash").addEventListener("click", function () {
         document.getElementById("splash-modal").classList.add("hidden");
-        
-        // Add a small timeout to ensure CSS transitions complete
         setTimeout(() => {
-            // Force a map resize to fix rendering issues
             mymap.invalidateSize();
         }, 300);
     });
+
+    // Initialize first page
+    showPage(1);
 });
 
 // ========== GLOBAL VARIABLES ========== //
@@ -71,13 +106,13 @@ var markersByYear = {};
 var visibleYears = new Set();
 
 const yearColors = {
-    '2019': '#23bdb4ff',
-    '2020': '#23bd66ff',
-    '2021': '#bdb423ff',
-    '2022': '#bd237aff',
-    '2023': '#bd232dff',
-    '2024': '#bd6623ff',
-    '2025': '#237abdff'
+    2019: "#23bdb4ff",
+    2020: "#23bd66ff",
+    2021: "#bdb423ff",
+    2022: "#bd237aff",
+    2023: "#bd232dff",
+    2024: "#bd6623ff",
+    2025: "#237abdff"
 };
 
 // Custom map marker icons
@@ -104,77 +139,76 @@ function createClusterIcon(cluster) {
     var markers = cluster.getAllChildMarkers();
     var years = {};
     var uniqueYears = new Set();
-    
+
     // Count markers by year
-    markers.forEach(function(marker) {
+    markers.forEach(function (marker) {
         var year = marker.feature.properties.year;
         years[year] = (years[year] || 0) + 1;
         uniqueYears.add(year);
     });
-    
+
     // Create donut chart SVG
     var size = 50;
     var radius = size / 2;
     var weight = 10;
     var svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
-    
+
     // Draw center circle
-    svg += `<circle cx="${radius}" cy="${radius}" r="${radius - weight/2}" fill="#f1d357" fill-opacity="0.7"/>`;
-    
+    svg += `<circle cx="${radius}" cy="${radius}" r="${radius - weight / 2}" fill="#f1d357" fill-opacity="0.7"/>`;
+
     // Color scheme for years
     var colors = {
-        '2019': '#23bdb4ff',
-        '2020': '#23bd66ff',
-        '2021': '#bdb423ff',
-        '2022': '#bd237aff',
-        '2023': '#bd232dff',
-        '2024': '#bd6623ff',
-        '2025': '#237abdff'
+        2019: "#23bdb4ff",
+        2020: "#23bd66ff",
+        2021: "#bdb423ff",
+        2022: "#bd237aff",
+        2023: "#bd232dff",
+        2024: "#bd6623ff",
+        2025: "#237abdff"
     };
-    
+
     // Check if all markers are from the same year
     if (uniqueYears.size === 1) {
         const year = uniqueYears.values().next().value;
-        const color = colors[year] || '#555';
-        
+        const color = colors[year] || "#555";
+
         // Draw a full circle for single-year clusters
-        svg += `<circle cx="${radius}" cy="${radius}" r="${radius - weight/2}" 
+        svg += `<circle cx="${radius}" cy="${radius}" r="${radius - weight / 2}" 
                     stroke="${color}" stroke-width="${weight}" fill="none" />`;
-    } 
-    else {
+    } else {
         // Draw segments for multi-year clusters
         var total = markers.length;
         var startAngle = -Math.PI / 2;
-        
-        Object.keys(years).forEach(function(year) {
+
+        Object.keys(years).forEach(function (year) {
             var percentage = years[year] / total;
             var endAngle = startAngle + percentage * Math.PI * 2;
-            
+
             // Calculate coordinates
-            var x1 = radius + Math.cos(startAngle) * (radius - weight/2);
-            var y1 = radius + Math.sin(startAngle) * (radius - weight/2);
-            var x2 = radius + Math.cos(endAngle) * (radius - weight/2);
-            var y2 = radius + Math.sin(endAngle) * (radius - weight/2);
-            
+            var x1 = radius + Math.cos(startAngle) * (radius - weight / 2);
+            var y1 = radius + Math.sin(startAngle) * (radius - weight / 2);
+            var x2 = radius + Math.cos(endAngle) * (radius - weight / 2);
+            var y2 = radius + Math.sin(endAngle) * (radius - weight / 2);
+
             // Large arc flag if angle > 180 degrees
             var largeArc = percentage > 0.5 ? 1 : 0;
-            
-            svg += `<path d="M ${x1} ${y1} A ${radius - weight/2} ${radius - weight/2} 0 ${largeArc} 1 ${x2} ${y2}" 
+
+            svg += `<path d="M ${x1} ${y1} A ${radius - weight / 2} ${radius - weight / 2} 0 ${largeArc} 1 ${x2} ${y2}" 
                        stroke="${colors[year]}" stroke-width="${weight}" fill="none" />`;
-            
+
             startAngle = endAngle;
         });
     }
-    
+
     // Add count text
     svg += `<text x="${radius}" y="${radius}" text-anchor="middle" dominant-baseline="middle" 
                 font-size="14" font-weight="bold" fill="black">${markers.length}</text>`;
-    
-    svg += '</svg>';
-    
+
+    svg += "</svg>";
+
     return L.divIcon({
         html: svg,
-        className: 'donut-cluster',
+        className: "donut-cluster",
         iconSize: [size, size]
     });
 }
@@ -190,19 +224,19 @@ var markerClusterGroup = L.markerClusterGroup({
 // ========== FILTERING FUNCTIONS ========== //
 function loadShowsData() {
     // Initialize years object
-    Object.keys(iconMap).forEach(year => {
+    Object.keys(iconMap).forEach((year) => {
         markersByYear[year] = [];
     });
 
-    fetch('UQ_shows.json')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(show => {
+    fetch("UQ_shows.json")
+        .then((response) => response.json())
+        .then((data) => {
+            data.forEach((show) => {
                 const yearStr = show.Year.toString();
                 const icon = iconMap[yearStr] || iconMap[2019];
-                
+
                 const marker = L.marker([show.Latitude, show.Longitude], { icon: icon });
-                
+
                 // Add feature properties
                 marker.feature = {
                     properties: {
@@ -228,35 +262,35 @@ function loadShowsData() {
             // Create year filter control AFTER data loads
             createYearControl();
         })
-        .catch(error => console.error('Error loading shows data:', error));
+        .catch((error) => console.error("Error loading shows data:", error));
 }
 
 // Create year filter control
 function createYearControl() {
-    const container = document.getElementById('year-control');
-    container.innerHTML = '<strong>Year & Show Count</strong>';
-    
+    const container = document.getElementById("year-control");
+    container.innerHTML = "<strong>Year & Show Count</strong>";
+
     Object.keys(markersByYear)
         .sort()
-        .forEach(year => {
+        .forEach((year) => {
             if (markersByYear[year].length > 0) {
-                const label = document.createElement('label');
-                
+                const label = document.createElement("label");
+
                 // Create checkbox
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
                 checkbox.checked = true;
                 checkbox.value = year;
-                
+
                 // Create color indicator
-                const colorIndicator = document.createElement('span');
+                const colorIndicator = document.createElement("span");
                 colorIndicator.className = `year-color year-${year}`;
                 colorIndicator.style.backgroundColor = yearColors[year];
-                
+
                 // Create text
                 const text = document.createTextNode(`${year} (${markersByYear[year].length})`);
-                
-                checkbox.addEventListener('change', function() {
+
+                checkbox.addEventListener("change", function () {
                     if (this.checked) {
                         visibleYears.add(year);
                     } else {
@@ -264,7 +298,7 @@ function createYearControl() {
                     }
                     updateVisibleMarkers();
                 });
-                
+
                 label.appendChild(checkbox);
                 label.appendChild(colorIndicator);
                 label.appendChild(text);
@@ -277,11 +311,11 @@ function createYearControl() {
 function updateVisibleMarkers() {
     // Remove all markers first
     markerClusterGroup.clearLayers();
-    
+
     // Add back markers for visible years
-    Object.keys(markersByYear).forEach(year => {
+    Object.keys(markersByYear).forEach((year) => {
         if (visibleYears.has(year)) {
-            markersByYear[year].forEach(marker => {
+            markersByYear[year].forEach((marker) => {
                 markerClusterGroup.addLayer(marker);
             });
         }
@@ -289,7 +323,7 @@ function updateVisibleMarkers() {
 }
 
 // Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
     loadShowsData();
 
     document.getElementById("accept-splash").addEventListener("click", function () {
