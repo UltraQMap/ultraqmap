@@ -106,13 +106,14 @@ var markersByYear = {};
 var visibleYears = new Set();
 
 const yearColors = {
-    2019: "#23bdb4ff",
-    2020: "#23bd66ff",
-    2021: "#bdb423ff",
-    2022: "#bd237aff",
-    2023: "#bd232dff",
-    2024: "#bd6623ff",
-    2025: "#237abdff"
+    2019: "#23bdb4",
+    2020: "#23bd66",
+    2021: "#bdb423",
+    2022: "#bd237a",
+    2023: "#bd232d",
+    2024: "#bd6623",
+    2025: "#237abd",
+    2026: "#6623bd"
 };
 
 // Custom map marker icons
@@ -131,7 +132,8 @@ var iconMap = {
     2022: new ShowIcon({ iconUrl: "MapMarkers/2022_marker2.png" }),
     2023: new ShowIcon({ iconUrl: "MapMarkers/2023_marker2.png" }),
     2024: new ShowIcon({ iconUrl: "MapMarkers/2024_marker2.png" }),
-    2025: new ShowIcon({ iconUrl: "MapMarkers/2025_marker2.png" })
+    2025: new ShowIcon({ iconUrl: "MapMarkers/2025_marker2.png" }),
+    2026: new ShowIcon({ iconUrl: "MapMarkers/2026_marker2.png" })
 };
 
 // Create a custom cluster icon function
@@ -158,13 +160,14 @@ function createClusterIcon(cluster) {
 
     // Color scheme for years
     var colors = {
-        2019: "#23bdb4ff",
-        2020: "#23bd66ff",
-        2021: "#bdb423ff",
-        2022: "#bd237aff",
-        2023: "#bd232dff",
-        2024: "#bd6623ff",
-        2025: "#237abdff"
+        2019: "#23bdb4",
+        2020: "#23bd66",
+        2021: "#bdb423",
+        2022: "#bd237a",
+        2023: "#bd232d",
+        2024: "#bd6623",
+        2025: "#237abd",
+        2026: "#6623bd"
     };
 
     // Check if all markers are from the same year
@@ -245,9 +248,14 @@ function loadShowsData() {
                 };
 
                 const popupContent = `
-                    <b>${show.Venue}</b><br>
+                    <b>${show.Venue}
+                    </b><br>
                     ${show.City}, ${show.State || show.Country}<br>
                     ${show.Month} ${show.Day}, ${show.Year}
+                    <br>
+                    <button onclick="openGallery('${show.ID}')" class="gallery-button">
+                        View Photos
+                    </button>
                 `;
                 marker.bindPopup(popupContent);
 
@@ -329,5 +337,170 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("accept-splash").addEventListener("click", function () {
         document.getElementById("splash-modal").classList.add("hidden");
         document.getElementById("map").classList.remove("inactive");
+    });
+});
+
+
+// ========== PHOTO GALLERY FUNCTIONS ========== //
+let currentGalleryID = null;
+let currentPhotos = [];
+let currentPhotoInfo = []; // Store photo info objects instead of just paths
+let currentPhotoIndex = 0;
+let allPhotosCache = null;
+
+// Function to extract photographer name from filename
+function extractPhotographerName(filename) {
+    // Remove file extension
+    const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
+    
+    // Find the last underscore and get everything after it
+    const lastUnderscoreIndex = nameWithoutExt.lastIndexOf('_');
+    
+    if (lastUnderscoreIndex !== -1) {
+        const name = nameWithoutExt.substring(lastUnderscoreIndex + 1);
+        return name.charAt(0).toUpperCase() + name.slice(1); // Capitalize first letter
+    }
+    
+    return "Unknown";
+}
+
+async function loadAllPhotos() {
+    if (!allPhotosCache) {
+        try {
+            const response = await fetch('photos.txt');
+            const text = await response.text();
+            // Split by lines, remove empty lines, and trim whitespace
+            allPhotosCache = text.split('\n')
+                .map(line => line.trim())
+                .filter(line => line !== '');
+        } catch (error) {
+            console.error("Error loading photos:", error);
+            allPhotosCache = [];
+        }
+    }
+    return allPhotosCache;
+}
+
+function openGallery(showID) {
+    currentGalleryID = showID;
+    currentPhotoIndex = 0;
+
+    // Find show details for title
+    fetch("UQ_shows.json")
+        .then((response) => response.json())
+        .then((data) => {
+            const show = data.find((s) => s.ID === showID);
+            if (show) {
+                document.getElementById("gallery-title").textContent =
+                    `${show.Venue} - ${show.Month} ${show.Day}, ${show.Year}`;
+            }
+        });
+
+    // Load photos for this show
+    loadPhotosForShow(showID);
+
+    // Show modal
+    document.getElementById("gallery-modal").style.display = "block";
+}
+
+async function loadPhotosForShow(showID) {
+    currentPhotos = [];
+    currentPhotoInfo = [];
+    const galleryImages = document.getElementById("gallery-images");
+    galleryImages.innerHTML = "<p>Loading photos...</p>";
+
+    // Pad ID to 4 digits
+    const paddedID = showID.toString().padStart(4, "0");
+
+    try {
+        // Load all photos from the text file
+        const allPhotos = await loadAllPhotos();
+        
+        // Filter photos for this show
+        const showPhotoFilenames = allPhotos.filter(filename => 
+            filename.startsWith(paddedID)
+        );
+        
+        if (showPhotoFilenames.length > 0) {
+            // Sort photos by filename (so they appear in order)
+            showPhotoFilenames.sort();
+            
+            // Create photo info objects for each photo
+            showPhotoFilenames.forEach(filename => {
+                const photographer = extractPhotographerName(filename);
+                
+                currentPhotoInfo.push({
+                    path: `sorted_photos/${filename}`,
+                    filename: filename,
+                    photographer: photographer,
+                    showID: paddedID
+                });
+            });
+            
+            displayCurrentPhoto();
+            document.querySelector(".gallery-nav").style.display = "flex";
+        } else {
+            galleryImages.innerHTML = "<p>No photos available for this show yet.</p>";
+            document.querySelector(".gallery-nav").style.display = "none";
+        }
+    } catch (error) {
+        console.error("Error loading photos:", error);
+        galleryImages.innerHTML = "<p>Error loading photos. Please try again.</p>";
+        document.querySelector(".gallery-nav").style.display = "none";
+    }
+}
+
+function displayCurrentPhoto() {
+    if (currentPhotoInfo.length === 0) return;
+
+    const galleryImages = document.getElementById("gallery-images");
+    const photoCounter = document.getElementById("photo-counter");
+
+    const currentPhoto = currentPhotoInfo[currentPhotoIndex];
+    
+    galleryImages.innerHTML = `
+        <div class="photo-container">
+            <img src="${currentPhoto.path}" alt="Photo from ${currentPhoto.showID}">
+            <div class="photo-caption">
+                Photo by ${currentPhoto.photographer}
+            </div>
+        </div>
+    `;
+    
+    photoCounter.textContent = `${currentPhotoIndex + 1} / ${currentPhotoInfo.length}`;
+
+    // Update button states
+    document.getElementById("prev-photo").disabled = currentPhotoIndex === 0;
+    document.getElementById("next-photo").disabled = currentPhotoIndex === currentPhotoInfo.length - 1;
+}
+
+// Gallery navigation
+document.addEventListener("DOMContentLoaded", function () {
+    // Close gallery
+    document.querySelector(".close-gallery").addEventListener("click", function () {
+        document.getElementById("gallery-modal").style.display = "none";
+    });
+
+    // Close when clicking outside
+    window.addEventListener("click", function (event) {
+        const modal = document.getElementById("gallery-modal");
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
+    // Navigation buttons
+    document.getElementById("prev-photo").addEventListener("click", function () {
+        if (currentPhotoIndex > 0) {
+            currentPhotoIndex--;
+            displayCurrentPhoto();
+        }
+    });
+
+    document.getElementById("next-photo").addEventListener("click", function () {
+        if (currentPhotoIndex < currentPhotoInfo.length - 1) {
+            currentPhotoIndex++;
+            displayCurrentPhoto();
+        }
     });
 });

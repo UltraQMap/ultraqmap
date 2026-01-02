@@ -101,7 +101,6 @@
 
         text.className = options.textClassName || 'donut-text';
 
-        //if css is included, please comment the next line for performance.
         //text.setAttribute('style', 'color: black;display: block;position: absolute;top: 50%;left: 0;z-index: 2;line-height: 0;width: 100%;text-align: center;')
 
         if (options.textCompiler) {
