@@ -396,17 +396,6 @@ footer a:hover {
     color: #333;
 }
 
-/*
-    background: none;
-    border: none;
-    padding: 5px;
-    line-height: 1;
-    z-index: 1;
-
-
-*/
-
-
 .close-gallery:hover {
     color: #000;
     background-color: white;
@@ -528,11 +517,11 @@ footer a:hover {
     }
     
     .header-logo {
-        height: 30px;
+        height: 25px;
     }
     
     h1 {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
     
     .leaflet-control-minimap {
