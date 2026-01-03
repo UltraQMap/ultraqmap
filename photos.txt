@@ -11,11 +11,16 @@
 0158_01_Kylie C.JPG             
 0160_01_Kylie C.jpg             
 0161_01_Kylie C.jpg             
+0195_01_Joseph L.jpeg           
+0195_02_Joseph L.jpeg           
+0195_03_Joseph L.jpeg           
+0195_04_Joseph L.jpeg           
 0196_01_Evan K.jpeg             
 0201_01_Enzo.jpeg               
 0201_02_Enzo.jpeg               
 0201_03_Enzo.jpeg               
 0202_01_Kylie C.JPG             
+0215_01_Dylan B.jpg             
 0231_01_Madeline M.jpg          
 0231_02_Madeline M and Ben A.jpg
 0231_03_Ben A.JPG               
@@ -36,6 +41,9 @@
 0246_04_Charles R.jpg           
 0246_05_Charles R.jpg           
 0249_01_Kylie C.JPG             
+0250_01_Joseph L.jpeg           
+0250_02_Joseph L.jpeg           
+0250_03_Joseph L.jpeg           
 0252_01_Charles R.jpg           
 0252_02_Charles R.jpg           
 0252_03_Charles R.jpg           
@@ -43,6 +51,7 @@
 0254_01_Charles R.jpg           
 0254_01_Dylan B.jpg             
 0254_02_Charles R.jpg           
+0254_02_Dylan B.jpg             
 0254_03_Charles R.jpg           
 0255_01_Charles R.jpg           
 0255_01_Kylie C.JPG             
