@@ -522,10 +522,11 @@ header a:hover {
         height: calc(100vh - 120px); /* Account for header/footer */
     }
 
-    .header-content {
+    .header-content, 
+    .footer-content {
         flex-direction: column;
         text-align: center;
-        gap: 5px;
+        gap: 4px;
     }
 
     .header-logo {
