@@ -384,11 +384,33 @@ footer a:hover {
 
 .close-gallery {
     position: absolute;
-    right: 20px;
+    right: 10px;
     top: 5px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 28px;
     cursor: pointer;
     color: #333;
+}
+
+/*
+    background: none;
+    border: none;
+    padding: 5px;
+    line-height: 1;
+    z-index: 1;
+
+
+*/
+
+
+.close-gallery:hover {
+    color: #000;
+    background-color: white;
+    border-radius: 50%;
 }
 
 #gallery-images {
