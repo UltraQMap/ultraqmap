@@ -41,66 +41,6 @@ L.control
     })
     .addTo(mymap);
 
-// Splash screen
-document.addEventListener("DOMContentLoaded", function () {
-    let currentPage = 1;
-    const totalPages = 3;
-
-    function showPage(pageNumber) {
-        // Hide all pages
-        document.querySelectorAll(".splash-page").forEach((page) => {
-            page.classList.remove("active");
-        });
-
-        // Show current page
-        document.getElementById(`page${pageNumber}`).classList.add("active");
-        currentPage = pageNumber;
-
-        // Update button states
-        document.getElementById("prev-page").disabled = currentPage === 1;
-        document.getElementById("next-page").disabled = currentPage === totalPages;
-    }
-
-    // Navigation event listeners
-    document.getElementById("next-page").addEventListener("click", function () {
-        if (currentPage < totalPages) {
-            showPage(currentPage + 1);
-        }
-    });
-
-    document.getElementById("prev-page").addEventListener("click", function () {
-        if (currentPage > 1) {
-            showPage(currentPage - 1);
-        }
-    });
-
-    document.querySelectorAll("#prev-page").forEach((button) => {
-        button.addEventListener("click", function () {
-            if (currentPage > 1) {
-                showPage(currentPage - 1);
-            }
-        });
-    });
-
-    // Close splash screen
-    document.getElementById("accept-splash").addEventListener("click", function () {
-        document.getElementById("splash-modal").classList.add("hidden");
-        setTimeout(() => {
-            mymap.invalidateSize();
-        }, 300);
-    });
-
-    document.getElementById("close-splash").addEventListener("click", function () {
-        document.getElementById("splash-modal").classList.add("hidden");
-        setTimeout(() => {
-            mymap.invalidateSize();
-        }, 300);
-    });
-
-    // Initialize first page
-    showPage(1);
-});
-
 // ========== GLOBAL VARIABLES ========== //
 var markersByYear = {};
 var visibleYears = new Set();
@@ -256,6 +196,9 @@ function loadShowsData() {
                     <button onclick="openGallery('${show.ID}')" class="gallery-button">
                         View Photos
                     </button>
+                    <button onclick="openStories('${show.ID}')" class="stories-button">
+                        View Stories
+                    </button>
                 `;
                 marker.bindPopup(popupContent);
 
@@ -330,21 +273,10 @@ function updateVisibleMarkers() {
     });
 }
 
-// Initialize when DOM is loaded
-document.addEventListener("DOMContentLoaded", function () {
-    loadShowsData();
-
-    document.getElementById("accept-splash").addEventListener("click", function () {
-        document.getElementById("splash-modal").classList.add("hidden");
-        document.getElementById("map").classList.remove("inactive");
-    });
-});
-
-
 // ========== PHOTO GALLERY FUNCTIONS ========== //
 let currentGalleryID = null;
 let currentPhotos = [];
-let currentPhotoInfo = []; // Store photo info objects instead of just paths
+let currentPhotoInfo = []; // Store photo info objects
 let currentPhotoIndex = 0;
 let allPhotosCache = null;
 
@@ -352,27 +284,28 @@ let allPhotosCache = null;
 function extractPhotographerName(filename) {
     // Remove file extension
     const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
-    
+
     // Find the last underscore and get everything after it
-    const lastUnderscoreIndex = nameWithoutExt.lastIndexOf('_');
-    
+    const lastUnderscoreIndex = nameWithoutExt.lastIndexOf("_");
+
     if (lastUnderscoreIndex !== -1) {
         const name = nameWithoutExt.substring(lastUnderscoreIndex + 1);
         return name.charAt(0).toUpperCase() + name.slice(1); // Capitalize first letter
     }
-    
+
     return "Unknown";
 }
 
 async function loadAllPhotos() {
     if (!allPhotosCache) {
         try {
-            const response = await fetch('photos.txt');
+            const response = await fetch("photos.txt");
             const text = await response.text();
             // Split by lines, remove empty lines, and trim whitespace
-            allPhotosCache = text.split('\n')
-                .map(line => line.trim())
-                .filter(line => line !== '');
+            allPhotosCache = text
+                .split("\n")
+                .map((line) => line.trim())
+                .filter((line) => line !== "");
         } catch (error) {
             console.error("Error loading photos:", error);
             allPhotosCache = [];
@@ -415,20 +348,18 @@ async function loadPhotosForShow(showID) {
     try {
         // Load all photos from the text file
         const allPhotos = await loadAllPhotos();
-        
+
         // Filter photos for this show
-        const showPhotoFilenames = allPhotos.filter(filename => 
-            filename.startsWith(paddedID)
-        );
-        
+        const showPhotoFilenames = allPhotos.filter((filename) => filename.startsWith(paddedID));
+
         if (showPhotoFilenames.length > 0) {
             // Sort photos by filename (so they appear in order)
             showPhotoFilenames.sort();
-            
+
             // Create photo info objects for each photo
-            showPhotoFilenames.forEach(filename => {
+            showPhotoFilenames.forEach((filename) => {
                 const photographer = extractPhotographerName(filename);
-                
+
                 currentPhotoInfo.push({
                     path: `sorted_photos/${filename}`,
                     filename: filename,
@@ -436,7 +367,7 @@ async function loadPhotosForShow(showID) {
                     showID: paddedID
                 });
             });
-            
+
             displayCurrentPhoto();
             document.querySelector(".gallery-nav").style.display = "flex";
         } else {
@@ -457,7 +388,7 @@ function displayCurrentPhoto() {
     const photoCounter = document.getElementById("photo-counter");
 
     const currentPhoto = currentPhotoInfo[currentPhotoIndex];
-    
+
     galleryImages.innerHTML = `
         <div class="photo-container">
             <img src="${currentPhoto.path}" alt="Photo from ${currentPhoto.showID}">
@@ -466,7 +397,7 @@ function displayCurrentPhoto() {
             </div>
         </div>
     `;
-    
+
     photoCounter.textContent = `${currentPhotoIndex + 1} / ${currentPhotoInfo.length}`;
 
     // Update button states
@@ -474,14 +405,238 @@ function displayCurrentPhoto() {
     document.getElementById("next-photo").disabled = currentPhotoIndex === currentPhotoInfo.length - 1;
 }
 
-// Gallery navigation
+// ========== STORIES GALLERY VARIABLES ========== //
+let currentStoriesID = null;
+let currentStories = [];
+let currentStoryIndex = 0;
+let allStoriesCache = null;
+
+// ========== STORIES GALLERY FUNCTIONS ========== //
+// Helper function to extract name from story filename (removes number prefix)
+function extractStoryNameFromFilename(filename) {
+    // Remove file extension
+    const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
+    
+    // Split by underscores
+    const parts = nameWithoutExt.split('_');
+    
+    // Format: [showID, number, nameParts...]
+    if (parts.length >= 3) {
+        // Join all parts after the number (index 2 and beyond)
+        const nameParts = parts.slice(2);
+        const name = nameParts.join(' ');
+        
+        // Capitalize each word
+        return name.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+    }
+    
+    return "Story";
+}
+
+async function loadAllStories() {
+    if (!allStoriesCache) {
+        try {
+            const response = await fetch("stories.txt");
+            const text = await response.text();
+
+            // Parse stories text file
+            const stories = {};
+            const lines = text.split("\n");
+            let currentStory = null;
+
+            for (const line of lines) {
+                const trimmedLine = line.trim();
+                if (!trimmedLine) continue;
+
+                // Check if line starts with a show ID (format: ID_Number_Filename.txt)
+                const storyMatch = trimmedLine.match(/^(\d{4})_(.+?)\.txt$/);
+                if (storyMatch) {
+                    const showID = storyMatch[1];
+                    const storyFilename = trimmedLine;
+
+                    if (!stories[showID]) {
+                        stories[showID] = [];
+                    }
+                    stories[showID].push(storyFilename);
+                }
+            }
+
+            allStoriesCache = stories;
+        } catch (error) {
+            console.error("Error loading stories:", error);
+            allStoriesCache = {};
+        }
+    }
+    return allStoriesCache;
+}
+
+async function loadStoriesForShow(showID) {
+    currentStories = [];
+    const paddedID = showID.toString().padStart(4, "0");
+
+    try {
+        const allStories = await loadAllStories();
+        const showStoryFilenames = allStories[paddedID] || [];
+
+        if (showStoryFilenames.length > 0) {
+            // Load each story file
+            for (const filename of showStoryFilenames) {
+                try {
+                    const response = await fetch(`stories/${filename}`);
+                    if (response.ok) {
+                        const storyText = await response.text();
+
+                        currentStories.push({
+                            id: paddedID,
+                            filename: filename,
+                            name: extractStoryNameFromFilename(filename),
+                            content: storyText
+                        });
+                    }
+                } catch (error) {
+                    console.error(`Error loading story ${filename}:`, error);
+                }
+            }
+
+            return currentStories.length > 0;
+        }
+    } catch (error) {
+        console.error("Error loading stories for show:", error);
+    }
+
+    return false;
+}
+
+function openStories(showID) {
+    currentStoriesID = showID;
+    currentStoryIndex = 0;
+
+    // Find show details for title
+    fetch("UQ_shows.json")
+        .then((response) => response.json())
+        .then((data) => {
+            const show = data.find((s) => s.ID === showID);
+            if (show) {
+                document.getElementById("stories-title").textContent =
+                    `${show.Venue} - ${show.Month} ${show.Day}, ${show.Year}`;
+            }
+        });
+
+    // Load stories for this show
+    loadStoriesForShow(showID).then((hasStories) => {
+        if (hasStories) {
+            displayCurrentStory();
+            document.querySelector("#stories-modal .gallery-nav").style.display = "flex";
+        } else {
+            document.getElementById("stories-content").innerHTML =
+                "<div class='story-container'><p>No stories available for this show yet.</p></div>";
+            document.querySelector("#stories-modal .gallery-nav").style.display = "none";
+        }
+
+        // Show modal
+        document.getElementById("stories-modal").style.display = "block";
+    });
+}
+
+function displayCurrentStory() {
+    if (currentStories.length === 0) return;
+
+    const storiesContent = document.getElementById("stories-content");
+    const storyCounter = document.getElementById("story-counter");
+
+    const currentStory = currentStories[currentStoryIndex];
+
+    storiesContent.innerHTML = `
+        <div class="story-container">
+            <h4>${currentStory.name}</h4>
+            <div class="story-content">${currentStory.content}</div>
+        </div>
+    `;
+
+    storyCounter.textContent = `${currentStoryIndex + 1} / ${currentStories.length}`;
+
+    // Update button states
+    document.getElementById("prev-story").disabled = currentStoryIndex === 0;
+    document.getElementById("next-story").disabled = currentStoryIndex === currentStories.length - 1;
+}
+
+// ========== MAIN DOMContentLoaded EVENT LISTENER ========== //
 document.addEventListener("DOMContentLoaded", function () {
+    // Splash screen functionality
+    let currentPage = 1;
+    const totalPages = 3;
+
+    function showPage(pageNumber) {
+        // Hide all pages
+        document.querySelectorAll(".splash-page").forEach((page) => {
+            page.classList.remove("active");
+        });
+
+        // Show current page
+        document.getElementById(`page${pageNumber}`).classList.add("active");
+        currentPage = pageNumber;
+
+        // Update button states
+        document.getElementById("prev-page").disabled = currentPage === 1;
+        document.getElementById("next-page").disabled = currentPage === totalPages;
+    }
+
+    // Navigation event listeners
+    document.getElementById("next-page").addEventListener("click", function () {
+        if (currentPage < totalPages) {
+            showPage(currentPage + 1);
+        }
+    });
+
+    document.getElementById("prev-page").addEventListener("click", function () {
+        if (currentPage > 1) {
+            showPage(currentPage - 1);
+        }
+    });
+
+    document.querySelectorAll("#prev-page").forEach((button) => {
+        button.addEventListener("click", function () {
+            if (currentPage > 1) {
+                showPage(currentPage - 1);
+            }
+        });
+    });
+
+    // Close splash screen
+    document.getElementById("accept-splash").addEventListener("click", function () {
+        document.getElementById("splash-modal").classList.add("hidden");
+        setTimeout(() => {
+            mymap.invalidateSize();
+        }, 300);
+    });
+
+    document.getElementById("close-splash").addEventListener("click", function () {
+        document.getElementById("splash-modal").classList.add("hidden");
+        setTimeout(() => {
+            mymap.invalidateSize();
+        }, 300);
+    });
+
+    // Initialize first page
+    showPage(1);
+
+    // Load shows data
+    loadShowsData();
+
+    document.getElementById("accept-splash").addEventListener("click", function () {
+        document.getElementById("splash-modal").classList.add("hidden");
+        document.getElementById("map").classList.remove("inactive");
+    });
+
+    // ========== PHOTO GALLERY EVENT LISTENERS ========== //
     // Close gallery
     document.querySelector(".close-gallery").addEventListener("click", function () {
         document.getElementById("gallery-modal").style.display = "none";
     });
 
-    // Close when clicking outside
+    // Close when clicking outside photo gallery
     window.addEventListener("click", function (event) {
         const modal = document.getElementById("gallery-modal");
         if (event.target === modal) {
@@ -489,7 +644,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Navigation buttons
+    // Photo navigation buttons
     document.getElementById("prev-photo").addEventListener("click", function () {
         if (currentPhotoIndex > 0) {
             currentPhotoIndex--;
@@ -501,6 +656,35 @@ document.addEventListener("DOMContentLoaded", function () {
         if (currentPhotoIndex < currentPhotoInfo.length - 1) {
             currentPhotoIndex++;
             displayCurrentPhoto();
+        }
+    });
+
+    // ========== STORIES GALLERY EVENT LISTENERS ========== //
+    // Close stories
+    document.querySelector(".close-stories").addEventListener("click", function () {
+        document.getElementById("stories-modal").style.display = "none";
+    });
+
+    // Close when clicking outside stories modal
+    window.addEventListener("click", function (event) {
+        const storiesModal = document.getElementById("stories-modal");
+        if (event.target === storiesModal) {
+            storiesModal.style.display = "none";
+        }
+    });
+
+    // Stories navigation buttons
+    document.getElementById("prev-story").addEventListener("click", function () {
+        if (currentStoryIndex > 0) {
+            currentStoryIndex--;
+            displayCurrentStory();
+        }
+    });
+
+    document.getElementById("next-story").addEventListener("click", function () {
+        if (currentStoryIndex < currentStories.length - 1) {
+            currentStoryIndex++;
+            displayCurrentStory();
         }
     });
 });
