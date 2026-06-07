@@ -59,6 +59,12 @@ h1 {
     width: 100%;
 }
 
+.leaflet-control-scale {
+    bottom: -5px;
+    left: 5px;
+    font-family: "Changa", sans-serif;
+}
+
 footer {
     background-color: rgb(11, 59, 56);
     color: white;
@@ -394,7 +400,8 @@ header a:hover {
     position: relative;
 }
 
-.close-gallery, .close-stories {
+.close-gallery,
+.close-stories {
     position: absolute;
     right: 10px;
     top: 5px;
@@ -454,12 +461,14 @@ header a:hover {
     cursor: not-allowed;
 }
 
-#photo-counter, #story-counter {
+#photo-counter,
+#story-counter {
     font-weight: bold;
 }
 
 /* Photo container styling */
-.photo-container, story-container {
+.photo-container,
+story-container {
     text-align: center;
     font-family: "Changa", sans-serif;
     margin: 0;
@@ -590,7 +599,9 @@ header a:hover {
     }
 
     .leaflet-control-scale {
-        bottom: 10px;
+        bottom: -5px;
+        left: 0;
+        font-family: "Changa", sans-serif;
     }
     #year-control {
         top: 140px;
@@ -603,4 +614,135 @@ header a:hover {
 
 .leaflet-bottom {
     padding-bottom: 10px;
+}
+
+/* STATS PANEL */
+#stats-control {
+    position: absolute;
+    bottom: 85px;
+    left: 10px;
+    z-index: 1000;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    font-family: "Changa", sans-serif;
+    max-width: 200px;
+    min-width: 180px;
+    font-size: 12px;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+#stats-control.minimized {
+    min-width: auto;
+    width: auto;
+}
+
+#stats-control.minimized .stats-content {
+    display: none;
+}
+
+.stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.stats-header:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.stats-header strong {
+    color: rgb(11, 59, 56);
+    font-size: 14px;
+}
+
+.stats-toggle {
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    color: rgb(11, 59, 56);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+#stats-control strong {
+    display: block;
+    text-align: center;
+    margin-bottom: -4px;
+    font-size: 14px;
+    color: rgb(11, 59, 56);
+}
+
+#top-cities-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.city-rank {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.city-rank .rank-number {
+    font-weight: bold;
+    color: rgb(208, 113, 38);
+    min-width: 25px;
+}
+
+.city-rank .city-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.city-rank .show-count {
+    font-weight: bold;
+    background-color: rgb(11, 59, 56);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: 10px;
+    min-width: 30px;
+    text-align: center;
+}
+
+/* Adjust for mobile */
+@media (max-width: 600px) {
+    #stats-control {
+        bottom: 80px;
+        left: 5px;
+        max-width: 160px;
+        min-width: 140px;
+        font-size: 10px;
+        padding: 6px;
+    }
+
+    .city-rank .rank-number {
+        min-width: 20px;
+        font-size: 10px;
+    }
+
+    .city-rank .show-count {
+        font-size: 9px;
+        min-width: 25px;
+        padding: 1px 4px;
+    }
 }

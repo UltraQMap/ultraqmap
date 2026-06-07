@@ -219,8 +219,9 @@ function loadShowsData() {
 // Create year filter control
 function createYearControl() {
     const container = document.getElementById("year-control");
-    container.innerHTML = "<strong>Year & Show Count</strong>";
+    container.innerHTML = '<strong style="color: rgb(11, 59, 56);">Year & Show Count</strong>';
 
+    Object.keys(markersByYear);
     Object.keys(markersByYear)
         .sort()
         .forEach((year) => {
@@ -416,22 +417,23 @@ let allStoriesCache = null;
 function extractStoryNameFromFilename(filename) {
     // Remove file extension
     const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
-    
+
     // Split by underscores
-    const parts = nameWithoutExt.split('_');
-    
+    const parts = nameWithoutExt.split("_");
+
     // Format: [showID, number, nameParts...]
     if (parts.length >= 3) {
         // Join all parts after the number (index 2 and beyond)
         const nameParts = parts.slice(2);
-        const name = nameParts.join(' ');
-        
+        const name = nameParts.join(" ");
+
         // Capitalize each word
-        return name.split(' ')
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-            .join(' ');
+        return name
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(" ");
     }
-    
+
     return "Story";
 }
 
@@ -659,6 +661,40 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
+    // ========== INITIATE COLLAPSIBLE STATS PANEL ========== //
+    const statsControl = document.getElementById("stats-control");
+    const statsToggle = document.getElementById("minimize-stats");
+    const statsHeader = document.getElementById("stats-header");
+
+    if (statsToggle && statsControl) {
+        // Toggle on button click
+        statsToggle.addEventListener("click", function (e) {
+            e.stopPropagation();
+            statsControl.classList.toggle("minimized");
+            // Change button text based on state
+            if (statsControl.classList.contains("minimized")) {
+                statsToggle.textContent = "+";
+            } else {
+                statsToggle.textContent = "−";
+            }
+        });
+
+        // Also toggle when clicking the header
+        if (statsHeader) {
+            statsHeader.addEventListener("click", function (e) {
+                // Don't trigger if clicking the toggle button directly
+                if (e.target !== statsToggle) {
+                    statsControl.classList.toggle("minimized");
+                    if (statsControl.classList.contains("minimized")) {
+                        statsToggle.textContent = "+";
+                    } else {
+                        statsToggle.textContent = "−";
+                    }
+                }
+            });
+        }
+    }
+
     // ========== STORIES GALLERY EVENT LISTENERS ========== //
     // Close stories
     document.querySelector(".close-stories").addEventListener("click", function () {
@@ -688,3 +724,131 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+// STATS PANEL
+// Add this function after the global variables section
+function calculateAndDisplayTopCities(showsData) {
+    // Count occurrences per city
+    const cityCount = {};
+
+    showsData.forEach((show) => {
+        // Create a unique key for each city (including state/country for disambiguation)
+        let locationKey;
+        if (show.State && show.State !== "") {
+            locationKey = `${show.City}, ${show.State}`;
+        } else {
+            locationKey = `${show.City}, ${show.Country}`;
+        }
+
+        cityCount[locationKey] = (cityCount[locationKey] || 0) + 1;
+    });
+
+    // Convert to array and sort by count (descending)
+    const sortedCities = Object.entries(cityCount)
+        .map(([city, count]) => ({ city, count }))
+        .sort((a, b) => b.count - a.count);
+
+    // Get top 5
+    const top5 = sortedCities.slice(0, 5);
+
+    // Display in the stats panel
+    const container = document.getElementById("top-cities-list");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    top5.forEach((item, index) => {
+        const rank = index + 1;
+        const cityDiv = document.createElement("div");
+        cityDiv.className = "city-rank";
+        cityDiv.innerHTML = `
+            <span class="rank-number">${rank}</span>
+            <span class="city-name" title="${item.city}">${item.city}</span>
+            <span class="show-count">${item.count}</span>
+        `;
+        container.appendChild(cityDiv);
+    });
+
+    // If fewer than 5 cities exist, show a message
+    if (top5.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding:10px;'>No data available</p>";
+    }
+}
+
+// Modify your loadShowsData function to call calculateAndDisplayTopCities
+function loadShowsData() {
+    // Initialize years object
+    Object.keys(iconMap).forEach((year) => {
+        markersByYear[year] = [];
+    });
+
+    fetch("UQ_shows.json")
+        .then((response) => response.json())
+        .then((data) => {
+            // Store the data for later use
+            window.showsData = data;
+
+            // Calculate and display top cities
+            calculateAndDisplayTopCities(data);
+
+            data.forEach((show) => {
+                const yearStr = show.Year.toString();
+                const icon = iconMap[yearStr] || iconMap[2019];
+
+                const marker = L.marker([show.Latitude, show.Longitude], { icon: icon });
+
+                // Add feature properties
+                marker.feature = {
+                    properties: {
+                        year: yearStr
+                    }
+                };
+
+                const popupContent = `
+                    <b>${show.Venue}
+                    </b><br>
+                    ${show.City}, ${show.State || show.Country}<br>
+                    ${show.Month} ${show.Day}, ${show.Year}
+                    <br>
+                    <button onclick="openGallery('${show.ID}')" class="gallery-button">
+                        View Photos
+                    </button>
+                    <button onclick="openStories('${show.ID}')" class="stories-button">
+                        View Stories
+                    </button>
+                `;
+                marker.bindPopup(popupContent);
+
+                // Store marker by year
+                if (markersByYear[yearStr]) {
+                    markersByYear[yearStr].push(marker);
+                    markerClusterGroup.addLayer(marker);
+                    visibleYears.add(yearStr);
+                }
+            });
+
+            // Create year filter control AFTER data loads
+            createYearControl();
+        })
+        .catch((error) => console.error("Error loading shows data:", error));
+}
+// Update this function to also refresh the stats based on visible markers
+function updateVisibleMarkers() {
+    // Remove all markers first
+    markerClusterGroup.clearLayers();
+
+    // Add back markers for visible years
+    Object.keys(markersByYear).forEach((year) => {
+        if (visibleYears.has(year)) {
+            markersByYear[year].forEach((marker) => {
+                markerClusterGroup.addLayer(marker);
+            });
+        }
+    });
+
+    // Refresh top cities based on currently visible shows
+    if (window.showsData) {
+        const visibleShows = window.showsData.filter((show) => visibleYears.has(show.Year.toString()));
+        calculateAndDisplayTopCities(visibleShows);
+    }
+}
