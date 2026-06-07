@@ -537,84 +537,6 @@ story-container {
     overflow-y: auto;
 }
 
-/* Mobile compatability */
-@media (max-width: 600px) {
-    .splash-content {
-        padding: 1rem;
-        padding-bottom: 70px;
-        margin: 10px;
-    }
-
-    .splash-content h1 {
-        font-size: 1.3rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .splash-text {
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
-
-    .primary-button {
-        padding: 0.7rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .nav-button {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-    }
-
-    .splash-navigation {
-        bottom: 15px;
-        gap: 10px;
-    }
-
-    body {
-        height: 100%;
-        min-height: -webkit-fill-available; /* For mobile browsers */
-    }
-
-    #map-container {
-        height: calc(100vh - 120px); /* Account for header/footer */
-    }
-
-    .header-content {
-        flex-direction: column;
-        text-align: center;
-        gap: 4px;
-    }
-
-    .header-logo {
-        height: 25px;
-    }
-
-    h1 {
-        font-size: 1.6rem;
-    }
-
-    .leaflet-control-minimap {
-        margin-bottom: 10px;
-    }
-
-    .leaflet-control-scale {
-        bottom: -5px;
-        left: 0;
-        font-family: "Changa", sans-serif;
-    }
-    #year-control {
-        top: 140px;
-        right: 5px;
-        max-width: 150px;
-        padding: 8px;
-        font-size: 14px;
-    }
-}
-
-.leaflet-bottom {
-    padding-bottom: 10px;
-}
 
 /* STATS PANEL */
 #stats-control {
@@ -724,8 +646,80 @@ story-container {
     text-align: center;
 }
 
-/* Adjust for mobile */
+
+/* Mobile compatability */
 @media (max-width: 600px) {
+    .splash-content {
+        padding: 1rem;
+        padding-bottom: 70px;
+        margin: 10px;
+    }
+
+    .splash-content h1 {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .splash-text {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .primary-button {
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .nav-button {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    .splash-navigation {
+        bottom: 15px;
+        gap: 10px;
+    }
+
+    body {
+        height: 100%;
+        min-height: -webkit-fill-available; /* For mobile browsers */
+    }
+
+    #map-container {
+        height: calc(100vh - 120px); /* Account for header/footer */
+    }
+
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 4px;
+    }
+
+    .header-logo {
+        height: 25px;
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    .leaflet-control-minimap {
+        margin-bottom: 10px;
+    }
+
+    .leaflet-control-scale {
+        bottom: -5px;
+        left: 0;
+        font-family: "Changa", sans-serif;
+    }
+    #year-control {
+        top: 140px;
+        right: 5px;
+        max-width: 150px;
+        padding: 8px;
+        font-size: 14px;
+    }
     #stats-control {
         bottom: 100px;
         left: 5px;
@@ -745,4 +739,8 @@ story-container {
         min-width: 25px;
         padding: 1px 4px;
     }
+}
+
+.leaflet-bottom {
+    padding-bottom: 10px;
 }
