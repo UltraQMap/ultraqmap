@@ -727,7 +727,7 @@ story-container {
 /* Adjust for mobile */
 @media (max-width: 600px) {
     #stats-control {
-        bottom: 80px;
+        bottom: 90px;
         left: 5px;
         max-width: 160px;
         min-width: 140px;
