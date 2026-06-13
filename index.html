@@ -1,194 +1,134 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULTRA Q MAP</title>
 
-        <title>ULTRA Q MAP</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@300;400;700&family=Lexend:wght@300;400;700&family=Changa:wght@200..800&display=swap" rel="stylesheet">
 
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Lexend+Exa:wght@300;400;700&family=Lexend:wght@300;400;700&family=Changa:wght@200..800&display=swap"
-            rel="stylesheet" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 
-        <!-- Leaflet CSS -->
-        <link
-            rel="stylesheet"
-            href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-            integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-            crossorigin="" />
+    <!-- MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
 
-        <!-- MarkerCluster CSS -->
-        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-        <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <!-- DonutCluster CSS -->
+    <link rel="stylesheet" href="Leaflet.DonutCluster.css">
 
-        <!-- DonutCluster CSS -->
-        <link rel="stylesheet" href="Leaflet.DonutCluster.css" />
+    <!-- Leaflet Minimap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.css">
 
-        <!-- Leaflet Minimap CSS -->
-        <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.css" />
+    <!-- JavaScript Libraries -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="Leaflet.DonutCluster.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.js"></script>
 
-        <!-- JavaScript Libraries -->
-        <!-- Load Leaflet first -->
-        <script
-            src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="ultraqmap.css">
+</head>
 
-        <!-- MarkerCluster -->
-        <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<body>
+    <div id="splash-modal" class="active">
+        <div class="splash-content">
+            <button id="close-splash" class="close-button">×</button>
 
-        <!-- DonutCluster -->
-        <script src="Leaflet.DonutCluster.js"></script>
-
-        <!-- Minimap -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.js"></script>
-
-        <!-- Custom CSS -->
-        <link rel="stylesheet" href="ultraqmap.css" />
-    </head>
-
-    <body>
-        <div id="splash-modal" class="active">
-            <div class="splash-content">
-                <button id="close-splash" class="close-button">×</button>
-                <!-- PAGE 1 -->
-                <div class="splash-page active" id="page1">
-                    <h1>Welcome to the Ultra Q Map</h1>
-                    <div class="splash-text">
-                        <p>
-                            I'm putting together an interactive web map that tracks every past Ultra Q show. Have they
-                            played near you? <br /><br />
-                            This is a fan-made project (not affiliated with the band), and will be updated as time
-                            allows. <br /><br />
-                            To follow along, check out the
-                            <a href="https://www.instagram.com/ultraqmap/" target="_blank" rel="noopener noreferrer">
-                                @ultraqmap
-                            </a>
-                            Instagram page!
-                        </p>
-                    </div>
+            <div class="splash-page active" id="page1">
+                <h1>Welcome to the Ultra Q Map</h1>
+                <div class="splash-text">
+                    <p>I'm putting together an interactive web map that tracks every past Ultra Q show. Have they played near you? <br><br>This is a fan-made project (not affiliated with the band), and will be updated as time allows. <br><br>To follow along, check out the <a href="https://www.instagram.com/ultraqmap/" target="_blank" rel="noopener noreferrer">@ultraqmap</a> Instagram page!</p>
                 </div>
-                <!-- PAGE 2 -->
-                <div class="splash-page" id="page2">
-                    <h1>Show Data</h1>
-                    <div class="splash-text">
-                        <p>
-                            Show details are pulled from the band's Instagram (<a
-                                href="https://www.instagram.com/ultraq/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                >@ultraq</a
-                            >),
-                            <a
-                                href="https://www.bandsintown.com/a/15392464-ultra-q"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                >Bandsintown</a
-                            >, and contributions from fellow fans. <br /><br />
-                            Notice something missing or incorrect? Email me at <b>ultraqmap@gmail.com</b>!
-                        </p>
-                    </div>
-                </div>
-                <!-- PAGE 3 -->
-                <div class="splash-page" id="page3">
-                    <h1>Fan Photos & Stories</h1>
-                    <div class="splash-text">
-                        <p>
-                            I'm incorporating pictures and stories from fellow fans to document their experiences at
-                            these shows. <br /><br />
-                            Have something you'd like to share? Send me an email or fill out this
-                            <a
-                                href="https://docs.google.com/forms/d/e/1FAIpQLSerjweiGwejyVxnbYcIk_LWk8W_3PQZixh8N9DtJifwg9Qn2w/viewform?usp=header"
-                                target="_blank"
-                                rel="noopener norefferer"
-                                >Google Form</a
-                            >!
-                        </p>
-                    </div>
-                    <br /><button id="accept-splash" class="primary-button">Explore the Map</button>
-                </div>
+            </div>
 
-                <div class="splash-navigation">
-                    <button id="prev-page" class="nav-button" disabled>←</button>
-                    <button id="next-page" class="nav-button">→</button>
+            <div class="splash-page" id="page2">
+                <h1>Show Data</h1>
+                <div class="splash-text">
+                    <p>Show details are pulled from the band's Instagram (<a href="https://www.instagram.com/ultraq/" target="_blank" rel="noopener noreferrer">@ultraq</a>), <a href="https://www.bandsintown.com/a/15392464-ultra-q" target="_blank" rel="noopener noreferrer">Bandsintown</a>, and contributions from fellow fans. <br><br>Notice something missing or incorrect? Email me at <b>ultraqmap@gmail.com</b>!</p>
                 </div>
+            </div>
+
+            <div class="splash-page" id="page3">
+                <h1>Fan Photos & Stories</h1>
+                <div class="splash-text">
+                    <p>I'm incorporating pictures and stories from fellow fans to document their experiences at these shows. <br><br>Have something you'd like to share? Send me an email or fill out this <a href="https://docs.google.com/forms/d/e/1FAIpQLSerjweiGwejyVxnbYcIk_LWk8W_3PQZixh8N9DtJifwg9Qn2w/viewform?usp=header" target="_blank" rel="noopener norefferer">Google Form</a>!</p>
+                </div>
+                <br><button id="accept-splash" class="primary-button">Explore the Map</button>
+            </div>
+
+            <div class="splash-navigation">
+                <button id="prev-page" class="nav-button" disabled>←</button>
+                <button id="next-page" class="nav-button">→</button>
             </div>
         </div>
+    </div>
 
-        <header>
-            <div class="header-content">
-                <h1>Ultra Q Map</h1>
-                <img src="Images/UQ_map_logo_crop.png" alt="Logo" class="header-logo" />
-                <a
-                    href="https://docs.google.com/forms/d/e/1FAIpQLSerjweiGwejyVxnbYcIk_LWk8W_3PQZixh8N9DtJifwg9Qn2w/viewform?usp=sharing&ouid=115915436845269291117"
-                    target="_blank"
-                    rel="noopener noreferrer">
-                    <h3>Submit Your Photos & Stories!</h3>
-                </a>
-            </div>
-        </header>
-
-        <div id="year-control" class="leaflet-control leaflet-bar"></div>
-
-        <!-- Stats Panel -->
-        <div id="stats-control" class="leaflet-control leaflet-bar minimized">
-            <div class="stats-header" id="stats-header">
-                <strong>Top 5 Cities</strong>
-                <button id="minimize-stats" class="stats-toggle">+</button>
-            </div>
-            <div id="stats-content" class="stats-content">
-                <div id="top-cities-list"></div>
-            </div>
-        </div>
-
-        <div id="map-container">
-            <div id="map"></div>
-        </div>
-
-        <footer>
-            © 2026 UltraQMap
-            <a href="https://www.instagram.com/ultraqmap/" target="_blank" rel="noopener noreferrer">
-                <img src="Images/instagram-logo.svg" alt="Instagram" style="width: 24px; height: 24px" />
-                @ultraqmap
+    <header>
+        <div class="header-content">
+            <h1>Ultra Q Map</h1>
+            <img src="Images/UQ_map_logo_crop.png" alt="Logo" class="header-logo">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSerjweiGwejyVxnbYcIk_LWk8W_3PQZixh8N9DtJifwg9Qn2w/viewform?usp=sharing&ouid=115915436845269291117" target="_blank" rel="noopener noreferrer">
+                <h3>Submit Your Photos & Stories!</h3>
             </a>
+        </div>
+    </header>
 
-            <img src="Images/email_logo.png" alt="Email" style="width: 22px; height: 22px" />
-            <p style="color: #d07126; margin-left: -10px">ultraqmap@gmail.com</p>
-        </footer>
+    <div id="year-control" class="leaflet-control leaflet-bar"></div>
 
-        <script src="ultraqmap.js"></script>
+    <div id="stats-control" class="leaflet-control leaflet-bar minimized">
+        <div class="stats-header" id="stats-header">
+            <strong>Top 5 Cities</strong>
+            <button id="minimize-stats" class="stats-toggle">+</button>
+        </div>
+        <div id="stats-content" class="stats-content">
+            <div id="top-cities-list"></div>
+        </div>
+    </div>
 
-        <!-- Photo Gallery -->
-        <div id="gallery-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-gallery">&times;</span>
-                <h3 id="gallery-title"></h3>
-                <div id="gallery-images"></div>
-                <div class="gallery-nav">
-                    <button id="prev-photo">← Previous</button>
-                    <span id="photo-counter">1 / 1</span>
-                    <button id="next-photo">Next →</button>
-                </div>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+
+    <footer>
+        © 2026 UltraQMap
+        <a href="https://www.instagram.com/ultraqmap/" target="_blank" rel="noopener noreferrer">
+            <img src="Images/instagram-logo.svg" alt="Instagram" style="width: 24px; height: 24px">
+            @ultraqmap
+        </a>
+        <img src="Images/email_logo.png" alt="Email" style="width: 22px; height: 22px">
+        <p style="color: #d07126; margin-left: -10px">ultraqmap@gmail.com</p>
+    </footer>
+
+    <div id="gallery-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-gallery">&times;</span>
+            <h3 id="gallery-title"></h3>
+            <div id="gallery-images"></div>
+            <div class="gallery-nav">
+                <button id="prev-photo">← Previous</button>
+                <span id="photo-counter">1 / 1</span>
+                <button id="next-photo">Next →</button>
             </div>
         </div>
+    </div>
 
-        <!-- Stories Gallery -->
-        <div id="stories-modal" class="modal">
-            <div class="modal-content">
-                <span class="close-stories">&times;</span>
-                <h3 id="stories-title"></h3>
-                <div id="stories-content"></div>
-                <div class="gallery-nav">
-                    <button id="prev-story">← Previous</button>
-                    <span id="story-counter">1 / 1</span>
-                    <button id="next-story">Next →</button>
-                </div>
+    <div id="stories-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-stories">&times;</span>
+            <h3 id="stories-title"></h3>
+            <div id="stories-content"></div>
+            <div class="gallery-nav">
+                <button id="prev-story">← Previous</button>
+                <span id="story-counter">1 / 1</span>
+                <button id="next-story">Next →</button>
             </div>
         </div>
-    </body>
+    </div>
+
+    <script src="ultraqmap.js"></script>
+</body>
 </html>
