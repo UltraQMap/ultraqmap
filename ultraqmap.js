@@ -3,7 +3,8 @@ var mymap = L.map("map").setView([38, -40], 3);
 
 // Add basemaps
 var streets = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: "abcd",
     maxZoom: 20
 }).addTo(mymap);
@@ -11,10 +12,12 @@ var streets = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{
 // Create reset view button
 var ZoomOutControl = L.Control.extend({
     options: { position: "topleft" },
-    onAdd: function(map) {
+    onAdd: function (map) {
         var button = L.DomUtil.create("button", "custom-button");
         button.title = "Reset view";
-        button.onclick = function() { map.setView([38, -40], 3); };
+        button.onclick = function () {
+            map.setView([38, -40], 3);
+        };
         return button;
     }
 });
@@ -30,13 +33,171 @@ var miniMap = new L.Control.MiniMap(L.tileLayer("https://{s}.basemaps.cartocdn.c
 // Add a scale bar to the map
 L.control.scale({ imperial: true, metric: true, position: "bottomleft" }).addTo(mymap);
 
+// ========== LAYER CONTROLS ========== //
+var clusterLayer = null;
+var heatmapLayer = null;
+var clusterEnabled = true;
+var heatmapEnabled = false;
+
+// Create layer control panel
+var LayerControl = L.Control.extend({
+    options: { position: "topleft" },
+    onAdd: function (map) {
+        var container = L.DomUtil.create("div", "layer-control-container");
+        container.style.backgroundColor = "white";
+        container.style.borderRadius = "4px";
+        container.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
+        container.style.padding = "5px";
+        container.style.display = "flex";
+        container.style.flexDirection = "column";
+        container.style.gap = "5px";
+
+        // Cluster toggle button
+        var clusterBtn = L.DomUtil.create("button", "layer-toggle-btn", container);
+        clusterBtn.id = "cluster-toggle-btn";
+        clusterBtn.style.cssText = `
+            padding: 5px 10px;
+            font-family: "Changa", sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        `;
+
+        // Create checkbox inside button
+        var clusterCheckbox = L.DomUtil.create("input", "", clusterBtn);
+        clusterCheckbox.type = "checkbox";
+        clusterCheckbox.checked = clusterEnabled;
+        clusterCheckbox.style.cssText = `
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            margin: 0;
+        `;
+
+        var clusterLabel = L.DomUtil.create("span", "", clusterBtn);
+        clusterLabel.textContent = "Donut Clusters";
+
+        // Heatmap toggle button
+        var heatmapBtn = L.DomUtil.create("button", "layer-toggle-btn", container);
+        heatmapBtn.id = "heatmap-toggle-btn";
+        heatmapBtn.style.cssText = `
+            padding: 5px 10px;
+            font-family: "Changa", sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        `;
+
+        // Create checkbox inside button
+        var heatmapCheckbox = L.DomUtil.create("input", "", heatmapBtn);
+        heatmapCheckbox.type = "checkbox";
+        heatmapCheckbox.checked = heatmapEnabled;
+        heatmapCheckbox.style.cssText = `
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            margin: 0;
+        `;
+
+        var heatmapLabel = L.DomUtil.create("span", "", heatmapBtn);
+        heatmapLabel.textContent = "Heat Map";
+
+        // Update button styles based on checkbox state
+        function updateClusterButtonStyle() {
+            if (clusterCheckbox.checked) {
+                clusterBtn.style.backgroundColor = "rgb(11, 59, 56)";
+                clusterBtn.style.color = "white";
+                clusterLabel.style.color = "white";
+            } else {
+                clusterBtn.style.backgroundColor = "#f0f0f0";
+                clusterBtn.style.color = "#666";
+                clusterLabel.style.color = "#666";
+            }
+        }
+
+        function updateHeatmapButtonStyle() {
+            if (heatmapCheckbox.checked) {
+                // Changed from orange to teal to match cluster button
+                heatmapBtn.style.backgroundColor = "rgb(11, 59, 56)";
+                heatmapBtn.style.color = "white";
+                heatmapLabel.style.color = "white";
+            } else {
+                heatmapBtn.style.backgroundColor = "#f0f0f0";
+                heatmapBtn.style.color = "#666";
+                heatmapLabel.style.color = "#666";
+            }
+        }
+
+        // Add click handlers for checkboxes
+        clusterCheckbox.addEventListener("change", function (e) {
+            e.stopPropagation();
+            toggleClusters(this.checked);
+            updateClusterButtonStyle();
+        });
+
+        heatmapCheckbox.addEventListener("change", function (e) {
+            e.stopPropagation();
+            toggleHeatmap(this.checked);
+            updateHeatmapButtonStyle();
+        });
+
+        // Also allow clicking the button to toggle checkbox
+        clusterBtn.addEventListener("click", function (e) {
+            // Don't trigger if clicking directly on checkbox
+            if (e.target !== clusterCheckbox) {
+                clusterCheckbox.checked = !clusterCheckbox.checked;
+                toggleClusters(clusterCheckbox.checked);
+                updateClusterButtonStyle();
+            }
+        });
+
+        heatmapBtn.addEventListener("click", function (e) {
+            // Don't trigger if clicking directly on checkbox
+            if (e.target !== heatmapCheckbox) {
+                heatmapCheckbox.checked = !heatmapCheckbox.checked;
+                toggleHeatmap(heatmapCheckbox.checked);
+                updateHeatmapButtonStyle();
+            }
+        });
+
+        // Set initial styles
+        updateClusterButtonStyle();
+        updateHeatmapButtonStyle();
+
+        return container;
+    }
+});
+
+new LayerControl().addTo(mymap);
+
 // ========== GLOBAL VARIABLES ========== //
 var markersByYear = {};
 var visibleYears = new Set();
+var allMarkers = [];
 
 const yearColors = {
-    2019: "#23bdb4", 2020: "#23bd66", 2021: "#bdb423", 2022: "#bd237a",
-    2023: "#bd232d", 2024: "#bd6623", 2025: "#237abd", 2026: "#6623bd"
+    2019: "#23bdb4",
+    2020: "#23bd66",
+    2021: "#bdb423",
+    2022: "#bd237a",
+    2023: "#bd232d",
+    2024: "#bd6623",
+    2025: "#237abd",
+    2026: "#6623bd"
 };
 
 // Custom map marker icons
@@ -60,10 +221,12 @@ function createClusterIcon(cluster) {
     var markers = cluster.getAllChildMarkers();
     var years = {};
     var uniqueYears = new Set();
-    var size = 50, radius = size / 2, weight = 10;
+    var size = 50,
+        radius = size / 2,
+        weight = 10;
     var svg = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
 
-    markers.forEach(function(marker) {
+    markers.forEach(function (marker) {
         var year = marker.feature.properties.year;
         years[year] = (years[year] || 0) + 1;
         uniqueYears.add(year);
@@ -77,7 +240,7 @@ function createClusterIcon(cluster) {
     } else {
         var total = markers.length;
         var startAngle = -Math.PI / 2;
-        Object.keys(years).forEach(function(year) {
+        Object.keys(years).forEach(function (year) {
             var percentage = years[year] / total;
             var endAngle = startAngle + percentage * Math.PI * 2;
             var x1 = radius + Math.cos(startAngle) * (radius - weight / 2);
@@ -100,15 +263,154 @@ var markerClusterGroup = L.markerClusterGroup({
     spiderfyDistanceMultiplier: 1,
     showCoverageOnHover: false,
     iconCreateFunction: createClusterIcon
-}).addTo(mymap);
+});
+
+// ========== LAYER MANAGEMENT FUNCTIONS ========== //
+function refreshClusterLayer() {
+    // Remove existing cluster layer if it exists
+    if (clusterLayer) {
+        mymap.removeLayer(clusterLayer);
+        clusterLayer = null;
+    }
+
+    // Only add markers if clusters are enabled
+    if (clusterEnabled) {
+        // Get visible markers based on selected years
+        var visibleMarkers = [];
+        Object.keys(markersByYear).forEach((year) => {
+            if (visibleYears.has(year)) {
+                visibleMarkers.push(...markersByYear[year]);
+            }
+        });
+
+        if (visibleMarkers.length > 0) {
+            // Create new cluster layer with visible markers
+            markerClusterGroup.clearLayers();
+            visibleMarkers.forEach(function (marker) {
+                markerClusterGroup.addLayer(marker);
+            });
+            clusterLayer = markerClusterGroup;
+            mymap.addLayer(clusterLayer);
+            console.log("Clusters enabled - showing", visibleMarkers.length, "markers in clusters");
+        } else {
+            console.log("No markers to display");
+        }
+    } else {
+        console.log("Clusters disabled - no markers showing");
+    }
+}
+
+function toggleClusters(enabled) {
+    clusterEnabled = enabled;
+    refreshClusterLayer();
+}
+
+function refreshHeatmapLayer() {
+    if (!window.showsData) return;
+
+    // Remove existing heatmap layer
+    if (heatmapLayer) {
+        mymap.removeLayer(heatmapLayer);
+        heatmapLayer = null;
+    }
+
+    if (heatmapEnabled) {
+        // Filter shows by visible years
+        const visibleShows = window.showsData.filter((show) => visibleYears.has(show.Year.toString()));
+
+        // Generate heat points (each show contributes equally)
+        var heatPoints = generateHeatmapData(visibleShows);
+
+        var heatOptions = {
+            radius: 30,
+            blur: 30,
+            maxZoom: 17,
+            minOpacity: 0.4,
+            gradient: {
+                0.2: "#23bdb4",
+                0.4: "#bdb423",
+                0.6: "#bd6623",
+                0.8: "#bd232d",
+                1.0: "#bd237a"
+            }
+        };
+
+        heatmapLayer = L.heatLayer(heatPoints, heatOptions);
+        heatmapLayer.addTo(mymap);
+        console.log("Heatmap enabled - showing", visibleShows.length, "shows");
+    }
+}
+
+function toggleHeatmap(enabled) {
+    heatmapEnabled = enabled;
+    refreshHeatmapLayer();
+}
+
+// Generate heat map data - each show contributes equally (intensity = 1)
+function generateHeatmapData(showsData) {
+    if (!showsData || showsData.length === 0) return [];
+
+    var heatPoints = [];
+
+    showsData.forEach(function (show) {
+        if (show.Latitude && show.Longitude) {
+            // Each show gets equal intensity (1)
+            heatPoints.push([show.Latitude, show.Longitude, 1]);
+        }
+    });
+
+    console.log(`Generated ${heatPoints.length} heat points from ${showsData.length} shows`);
+    return heatPoints;
+}
+
+// Temporary notification helper
+function showTemporaryNotification(message) {
+    var notification = document.createElement("div");
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(11, 59, 56, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-family: "Changa", sans-serif;
+        font-size: 14px;
+        z-index: 2000;
+        animation: fadeOut 2s ease forwards;
+        pointer-events: none;
+    `;
+
+    if (!document.querySelector("#fade-out-animation")) {
+        var style = document.createElement("style");
+        style.id = "fade-out-animation";
+        style.textContent = `
+            @keyframes fadeOut {
+                0% { opacity: 1; transform: translateY(0); }
+                70% { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-10px); visibility: hidden; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.body.appendChild(notification);
+    setTimeout(function () {
+        if (notification.parentNode) notification.parentNode.removeChild(notification);
+    }, 2000);
+}
 
 // ========== FILTERING FUNCTIONS ========== //
 function loadShowsData() {
-    Object.keys(iconMap).forEach((year) => { markersByYear[year] = []; });
+    Object.keys(iconMap).forEach((year) => {
+        markersByYear[year] = [];
+    });
 
     fetch("UQ_shows.json")
         .then((response) => response.json())
         .then((data) => {
+            console.log("Shows data loaded:", data.length, "shows");
             window.showsData = data;
             calculateAndDisplayTopCities(data);
 
@@ -129,12 +431,17 @@ function loadShowsData() {
 
                 if (markersByYear[yearStr]) {
                     markersByYear[yearStr].push(marker);
-                    markerClusterGroup.addLayer(marker);
+                    allMarkers.push(marker);
                     visibleYears.add(yearStr);
                 }
             });
 
+            console.log("Visible years:", Array.from(visibleYears));
             createYearControl();
+
+            // Initialize both layers
+            refreshClusterLayer();
+            refreshHeatmapLayer();
         })
         .catch((error) => console.error("Error loading shows data:", error));
 }
@@ -143,38 +450,37 @@ function createYearControl() {
     const container = document.getElementById("year-control");
     container.innerHTML = '<strong style="color: rgb(11, 59, 56);">Year & Show Count</strong>';
 
-    Object.keys(markersByYear).sort().forEach((year) => {
-        if (markersByYear[year].length > 0) {
-            const label = document.createElement("label");
-            const checkbox = document.createElement("input");
-            checkbox.type = "checkbox";
-            checkbox.checked = true;
-            checkbox.value = year;
-            const colorIndicator = document.createElement("span");
-            colorIndicator.className = `year-color year-${year}`;
-            colorIndicator.style.backgroundColor = yearColors[year];
-            const text = document.createTextNode(`${year} (${markersByYear[year].length})`);
+    Object.keys(markersByYear)
+        .sort()
+        .forEach((year) => {
+            if (markersByYear[year].length > 0) {
+                const label = document.createElement("label");
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.checked = true;
+                checkbox.value = year;
+                const colorIndicator = document.createElement("span");
+                colorIndicator.className = `year-color year-${year}`;
+                colorIndicator.style.backgroundColor = yearColors[year];
+                const text = document.createTextNode(`${year} (${markersByYear[year].length})`);
 
-            checkbox.addEventListener("change", function() {
-                this.checked ? visibleYears.add(year) : visibleYears.delete(year);
-                updateVisibleMarkers();
-            });
+                checkbox.addEventListener("change", function () {
+                    this.checked ? visibleYears.add(year) : visibleYears.delete(year);
+                    updateVisibleMarkers();
+                });
 
-            label.appendChild(checkbox);
-            label.appendChild(colorIndicator);
-            label.appendChild(text);
-            container.appendChild(label);
-        }
-    });
+                label.appendChild(checkbox);
+                label.appendChild(colorIndicator);
+                label.appendChild(text);
+                container.appendChild(label);
+            }
+        });
 }
 
 function updateVisibleMarkers() {
-    markerClusterGroup.clearLayers();
-    Object.keys(markersByYear).forEach((year) => {
-        if (visibleYears.has(year)) {
-            markersByYear[year].forEach((marker) => markerClusterGroup.addLayer(marker));
-        }
-    });
+    // Refresh both layers with new year selection
+    refreshClusterLayer();
+    refreshHeatmapLayer();
 
     if (window.showsData) {
         const visibleShows = window.showsData.filter((show) => visibleYears.has(show.Year.toString()));
@@ -186,7 +492,8 @@ function updateVisibleMarkers() {
 function calculateAndDisplayTopCities(showsData) {
     const cityCount = {};
     showsData.forEach((show) => {
-        let locationKey = show.State && show.State !== "" ? `${show.City}, ${show.State}` : `${show.City}, ${show.Country}`;
+        let locationKey =
+            show.State && show.State !== "" ? `${show.City}, ${show.State}` : `${show.City}, ${show.Country}`;
         cityCount[locationKey] = (cityCount[locationKey] || 0) + 1;
     });
 
@@ -198,13 +505,17 @@ function calculateAndDisplayTopCities(showsData) {
     const container = document.getElementById("top-cities-list");
     if (!container) return;
 
-    container.innerHTML = top5.length === 0 ? "<p style='text-align:center; padding:10px;'>No data available</p>" : "";
-    top5.forEach((item, index) => {
-        const cityDiv = document.createElement("div");
-        cityDiv.className = "city-rank";
-        cityDiv.innerHTML = `<span class="rank-number">${index + 1}</span><span class="city-name" title="${item.city}">${item.city}</span><span class="show-count">${item.count}</span>`;
-        container.appendChild(cityDiv);
-    });
+    container.innerHTML = "";
+    if (top5.length === 0) {
+        container.innerHTML = "<p style='text-align:center; padding:10px;'>No data available</p>";
+    } else {
+        top5.forEach((item, index) => {
+            const cityDiv = document.createElement("div");
+            cityDiv.className = "city-rank";
+            cityDiv.innerHTML = `<span class="rank-number">${index + 1}</span><span class="city-name" title="${item.city}">${item.city}</span><span class="show-count">${item.count}</span>`;
+            container.appendChild(cityDiv);
+        });
+    }
 }
 
 // ========== PHOTO GALLERY FUNCTIONS ========== //
@@ -228,7 +539,10 @@ async function loadAllPhotos() {
         try {
             const response = await fetch("photos.txt");
             const text = await response.text();
-            allPhotosCache = text.split("\n").map(line => line.trim()).filter(line => line !== "");
+            allPhotosCache = text
+                .split("\n")
+                .map((line) => line.trim())
+                .filter((line) => line !== "");
         } catch (error) {
             console.error("Error loading photos:", error);
             allPhotosCache = [];
@@ -242,10 +556,12 @@ function openGallery(showID) {
     currentPhotoIndex = 0;
 
     fetch("UQ_shows.json")
-        .then(response => response.json())
-        .then(data => {
-            const show = data.find(s => s.ID === showID);
-            if (show) document.getElementById("gallery-title").textContent = `${show.Venue} - ${show.Month} ${show.Day}, ${show.Year}`;
+        .then((response) => response.json())
+        .then((data) => {
+            const show = data.find((s) => s.ID === showID);
+            if (show)
+                document.getElementById("gallery-title").textContent =
+                    `${show.Venue} - ${show.Month} ${show.Day}, ${show.Year}`;
         });
 
     loadPhotosForShow(showID);
@@ -261,11 +577,15 @@ async function loadPhotosForShow(showID) {
 
     try {
         const allPhotos = await loadAllPhotos();
-        const showPhotoFilenames = allPhotos.filter(filename => filename.startsWith(paddedID)).sort();
+        const showPhotoFilenames = allPhotos.filter((filename) => filename.startsWith(paddedID)).sort();
 
         if (showPhotoFilenames.length > 0) {
-            showPhotoFilenames.forEach(filename => {
-                currentPhotoInfo.push({ path: `sorted_photos/${filename}`, photographer: extractPhotographerName(filename), showID: paddedID });
+            showPhotoFilenames.forEach((filename) => {
+                currentPhotoInfo.push({
+                    path: `sorted_photos/${filename}`,
+                    photographer: extractPhotographerName(filename),
+                    showID: paddedID
+                });
             });
             displayCurrentPhoto();
             document.querySelector(".gallery-nav").style.display = "flex";
@@ -304,7 +624,12 @@ function extractStoryNameFromFilename(filename) {
     const nameWithoutExt = filename.replace(/\.[^/.]+$/, "");
     const parts = nameWithoutExt.split("_");
     if (parts.length >= 3) {
-        return parts.slice(2).join(" ").split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
+        return parts
+            .slice(2)
+            .join(" ")
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(" ");
     }
     return "Story";
 }
@@ -315,7 +640,7 @@ async function loadAllStories() {
             const response = await fetch("stories.txt");
             const text = await response.text();
             const stories = {};
-            text.split("\n").forEach(line => {
+            text.split("\n").forEach((line) => {
                 const trimmedLine = line.trim();
                 if (trimmedLine) {
                     const storyMatch = trimmedLine.match(/^(\d{4})_(.+?)\.txt$/);
@@ -368,18 +693,21 @@ function openStories(showID) {
     currentStoryIndex = 0;
 
     fetch("UQ_shows.json")
-        .then(response => response.json())
-        .then(data => {
-            const show = data.find(s => s.ID === showID);
-            if (show) document.getElementById("stories-title").textContent = `${show.Venue} - ${show.Month} ${show.Day}, ${show.Year}`;
+        .then((response) => response.json())
+        .then((data) => {
+            const show = data.find((s) => s.ID === showID);
+            if (show)
+                document.getElementById("stories-title").textContent =
+                    `${show.Venue} - ${show.Month} ${show.Day}, ${show.Year}`;
         });
 
-    loadStoriesForShow(showID).then(hasStories => {
+    loadStoriesForShow(showID).then((hasStories) => {
         if (hasStories) {
             displayCurrentStory();
             document.querySelector("#stories-modal .gallery-nav").style.display = "flex";
         } else {
-            document.getElementById("stories-content").innerHTML = "<div class='story-container'><p>No stories available for this show yet.</p></div>";
+            document.getElementById("stories-content").innerHTML =
+                "<div class='story-container'><p>No stories available for this show yet.</p></div>";
             document.querySelector("#stories-modal .gallery-nav").style.display = "none";
         }
         document.getElementById("stories-modal").style.display = "block";
@@ -401,20 +729,24 @@ function displayCurrentStory() {
 }
 
 // ========== MAIN DOMContentLoaded EVENT LISTENER ========== //
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     let currentPage = 1;
     const totalPages = 3;
 
     function showPage(pageNumber) {
-        document.querySelectorAll(".splash-page").forEach(page => page.classList.remove("active"));
+        document.querySelectorAll(".splash-page").forEach((page) => page.classList.remove("active"));
         document.getElementById(`page${pageNumber}`).classList.add("active");
         currentPage = pageNumber;
         document.getElementById("prev-page").disabled = currentPage === 1;
         document.getElementById("next-page").disabled = currentPage === totalPages;
     }
 
-    document.getElementById("next-page").addEventListener("click", () => { if (currentPage < totalPages) showPage(currentPage + 1); });
-    document.getElementById("prev-page").addEventListener("click", () => { if (currentPage > 1) showPage(currentPage - 1); });
+    document.getElementById("next-page").addEventListener("click", () => {
+        if (currentPage < totalPages) showPage(currentPage + 1);
+    });
+    document.getElementById("prev-page").addEventListener("click", () => {
+        if (currentPage > 1) showPage(currentPage - 1);
+    });
 
     function closeSplash() {
         document.getElementById("splash-modal").classList.add("hidden");
@@ -428,10 +760,25 @@ document.addEventListener("DOMContentLoaded", function() {
     loadShowsData();
 
     // Photo gallery listeners
-    document.querySelector(".close-gallery").addEventListener("click", () => document.getElementById("gallery-modal").style.display = "none");
-    window.addEventListener("click", (event) => { if (event.target === document.getElementById("gallery-modal")) document.getElementById("gallery-modal").style.display = "none"; });
-    document.getElementById("prev-photo").addEventListener("click", () => { if (currentPhotoIndex > 0) { currentPhotoIndex--; displayCurrentPhoto(); } });
-    document.getElementById("next-photo").addEventListener("click", () => { if (currentPhotoIndex < currentPhotoInfo.length - 1) { currentPhotoIndex++; displayCurrentPhoto(); } });
+    document
+        .querySelector(".close-gallery")
+        .addEventListener("click", () => (document.getElementById("gallery-modal").style.display = "none"));
+    window.addEventListener("click", (event) => {
+        if (event.target === document.getElementById("gallery-modal"))
+            document.getElementById("gallery-modal").style.display = "none";
+    });
+    document.getElementById("prev-photo").addEventListener("click", () => {
+        if (currentPhotoIndex > 0) {
+            currentPhotoIndex--;
+            displayCurrentPhoto();
+        }
+    });
+    document.getElementById("next-photo").addEventListener("click", () => {
+        if (currentPhotoIndex < currentPhotoInfo.length - 1) {
+            currentPhotoIndex++;
+            displayCurrentPhoto();
+        }
+    });
 
     // Collapsible stats panel
     const statsControl = document.getElementById("stats-control");
@@ -443,13 +790,35 @@ document.addEventListener("DOMContentLoaded", function() {
             statsControl.classList.toggle("minimized");
             statsToggle.textContent = statsControl.classList.contains("minimized") ? "+" : "−";
         };
-        statsToggle.addEventListener("click", (e) => { e.stopPropagation(); toggleStats(); });
-        if (statsHeader) statsHeader.addEventListener("click", (e) => { if (e.target !== statsToggle) toggleStats(); });
+        statsToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleStats();
+        });
+        if (statsHeader) {
+            statsHeader.addEventListener("click", (e) => {
+                if (e.target !== statsToggle) toggleStats();
+            });
+        }
     }
 
     // Stories gallery listeners
-    document.querySelector(".close-stories").addEventListener("click", () => document.getElementById("stories-modal").style.display = "none");
-    window.addEventListener("click", (event) => { if (event.target === document.getElementById("stories-modal")) document.getElementById("stories-modal").style.display = "none"; });
-    document.getElementById("prev-story").addEventListener("click", () => { if (currentStoryIndex > 0) { currentStoryIndex--; displayCurrentStory(); } });
-    document.getElementById("next-story").addEventListener("click", () => { if (currentStoryIndex < currentStories.length - 1) { currentStoryIndex++; displayCurrentStory(); } });
+    document
+        .querySelector(".close-stories")
+        .addEventListener("click", () => (document.getElementById("stories-modal").style.display = "none"));
+    window.addEventListener("click", (event) => {
+        if (event.target === document.getElementById("stories-modal"))
+            document.getElementById("stories-modal").style.display = "none";
+    });
+    document.getElementById("prev-story").addEventListener("click", () => {
+        if (currentStoryIndex > 0) {
+            currentStoryIndex--;
+            displayCurrentStory();
+        }
+    });
+    document.getElementById("next-story").addEventListener("click", () => {
+        if (currentStoryIndex < currentStories.length - 1) {
+            currentStoryIndex++;
+            displayCurrentStory();
+        }
+    });
 });

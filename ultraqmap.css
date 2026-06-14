@@ -68,7 +68,7 @@ h1 {
 footer {
     background-color: rgb(11, 59, 56);
     color: white;
-    padding: 5px;
+    padding: 4px;
     text-align: center;
     flex-shrink: 0;
     line-height: 1;
@@ -154,6 +154,67 @@ header a:hover {
     cursor: pointer;
 }
 
+/* ========== CUSTOM CHECKBOX STYLES ========== */
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgb(11, 59, 56);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    margin: 0;
+    background-color: white;
+}
+
+input[type="checkbox"]:hover {
+    transform: scale(1.1);
+}
+
+input[type="checkbox"]:checked {
+    background-color: rgb(208, 113, 38);
+    border-color: rgb(208, 113, 38);
+}
+
+input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 11px;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+}
+
+/* Specific styling for year filter checkboxes to maintain their original behavior */
+#year-control input[type="checkbox"] {
+    width: auto;
+    height: auto;
+    appearance: auto;
+    -webkit-appearance: auto;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    accent-color: rgb(11, 59, 56);
+}
+
+#year-control input[type="checkbox"]:hover {
+    transform: none;
+}
+
+#year-control input[type="checkbox"]:checked {
+    background-color: transparent;
+    border: none;
+}
+
+#year-control input[type="checkbox"]:checked::after {
+    content: none;
+}
+/* ========== END CUSTOM CHECKBOX STYLES ========== */
+
 .custom-button {
     background-color: rgba(255, 255, 255);
     background-image: url("Images/globe_icon.png");
@@ -161,12 +222,11 @@ header a:hover {
     background-repeat: no-repeat;
     background-position: center;
     background-clip: padding-box;
-    opacity: 90%;
     border: solid rgba(0, 0, 0, 0.2) 2px;
     border-radius: 4px;
     width: 33px;
     height: 33px;
-    top: 0;
+    top: -5px;
     left: 0;
     cursor: pointer;
 }
@@ -514,21 +574,21 @@ header a:hover {
     overflow-y: auto;
 }
 
+/* Updated Stats Panel to match layer controls */
 #stats-control {
     position: absolute;
     bottom: 85px;
     left: 10px;
     z-index: 1000;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     font-family: "Changa", sans-serif;
-    max-width: 200px;
-    min-width: 180px;
-    font-size: 12px;
+    max-width: 260px;
+    min-width: 210px;
     transition: all 0.3s ease;
     pointer-events: auto;
+    overflow: hidden;
 }
 
 #stats-control.minimized {
@@ -547,8 +607,12 @@ header a:hover {
     padding: 8px 12px;
     cursor: pointer;
     user-select: none;
-    border-radius: 8px;
+    background-color: white;
+    font-family: "Changa", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
     transition: background-color 0.2s;
+    gap: 10px;
 }
 
 .stats-header:hover {
@@ -557,31 +621,35 @@ header a:hover {
 
 .stats-header strong {
     color: rgb(11, 59, 56);
-    font-size: 14px;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 .stats-toggle {
     background: none;
     border: none;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     color: rgb(11, 59, 56);
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
-    justify-content: right;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    justify-content: center;
+    border-radius: 3px;
+    transition: all 0.2s;
+    font-family: "Changa", sans-serif;
 }
 
-#stats-control strong {
-    display: block;
-    text-align: center;
-    margin-bottom: -4px;
-    font-size: 14px;
-    color: rgb(11, 59, 56);
+.stats-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.stats-content {
+    padding: 8px 12px;
+    border-top: 1px solid #eee;
+    background-color: white;
 }
 
 #top-cities-list {
@@ -593,14 +661,20 @@ header a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 3px 0;
-    border-bottom: 1px solid #eee;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 11px;
+}
+
+.city-rank:last-child {
+    border-bottom: none;
 }
 
 .city-rank .rank-number {
     font-weight: bold;
     color: rgb(208, 113, 38);
     min-width: 25px;
+    font-size: 11px;
 }
 
 .city-rank .city-name {
@@ -608,6 +682,8 @@ header a:hover {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 11px;
+    color: #333;
 }
 
 .city-rank .show-count {
@@ -621,6 +697,41 @@ header a:hover {
     text-align: center;
 }
 
+/* Layer Control Panel */
+.layer-control-container {
+    top: -116px;
+    left: 38px;
+    background-color: white;
+    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.layer-toggle-btn {
+    padding: 5px 10px;
+    font-family: "Changa", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.layer-toggle-btn:hover {
+    transform: scale(1.02);
+    opacity: 0.95;
+}
+
+/* Mobile responsiveness */
 @media (max-width: 600px) {
     .splash-content {
         padding: 1rem;
@@ -696,23 +807,54 @@ header a:hover {
     }
 
     #stats-control {
-        bottom: 130px;
+        bottom: 120px;
         left: 5px;
-        max-width: 160px;
-        min-width: 140px;
-        font-size: 10px;
-        padding: 6px;
+        max-width: 200px;
+        min-width: 175px;
     }
 
+    .stats-header {
+        padding: 6px 8px;
+    }
+    
+    .stats-content {
+        padding: 6px 8px;
+    }
+    
+    .city-rank {
+        padding: 4px 0;
+        font-size: 10px;
+    }
+    
     .city-rank .rank-number {
+        font-size: 10px;
         min-width: 20px;
+    }
+    
+    .city-rank .city-name {
         font-size: 10px;
     }
-
+    
     .city-rank .show-count {
         font-size: 9px;
         min-width: 25px;
         padding: 1px 4px;
+    }
+    
+    .stats-toggle {
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
+    }
+
+    .layer-toggle-btn {
+        padding: 3px 6px;
+        font-size: 10px;
+    }
+    
+    input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
     }
 }
 

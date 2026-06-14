@@ -22,12 +22,18 @@
 
     <!-- Leaflet Minimap CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.css">
-
-    <!-- JavaScript Libraries -->
+    
+    <!-- JavaScript Libraries - ORDER MATTERS! -->
+    <!-- 1. Leaflet core first -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- 2. Leaflet plugins (order generally doesn't matter, but after Leaflet) -->
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script src="Leaflet.DonutCluster.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.js"></script>
+    
+    <!-- 3. Leaflet Heatmap plugin - MUST be after Leaflet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="ultraqmap.css">
@@ -79,12 +85,13 @@
 
     <div id="year-control" class="leaflet-control leaflet-bar"></div>
 
-    <div id="stats-control" class="leaflet-control leaflet-bar minimized">
+    <!-- Stats Panel - Updated with icon to match layer controls -->
+    <div id="stats-control" class="minimized">
         <div class="stats-header" id="stats-header">
             <strong>Top 5 Cities</strong>
             <button id="minimize-stats" class="stats-toggle">+</button>
         </div>
-        <div id="stats-content" class="stats-content">
+        <div class="stats-content">
             <div id="top-cities-list"></div>
         </div>
     </div>
