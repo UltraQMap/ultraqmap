@@ -731,6 +731,34 @@ input[type="checkbox"]:checked::after {
     opacity: 0.95;
 }
 
+/* Story Finder Button - Standalone */
+.story-finder-btn {
+    top: -122px;
+    left: 39px;
+    background-color: rgb(208, 113, 38);
+    color: white;
+    font-family: "Changa", sans-serif;
+    font-weight: bold;
+    font-size: 13px;
+    padding: 4px 11px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+}
+
+.story-finder-btn:hover {
+    transform: scale(1.02);
+    background-color: rgb(218,126,53);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 600px) {
     .splash-content {
@@ -856,6 +884,11 @@ input[type="checkbox"]:checked::after {
         width: 14px;
         height: 14px;
     }
+    
+    .story-finder-btn {
+        font-size: 11px;
+        padding: 4px 10px;
+    } 
 }
 
 .leaflet-bottom {

@@ -87,20 +87,6 @@ var LayerControl = L.Control.extend({
         // Heatmap toggle button
         var heatmapBtn = L.DomUtil.create("button", "layer-toggle-btn", container);
         heatmapBtn.id = "heatmap-toggle-btn";
-        heatmapBtn.style.cssText = `
-            padding: 5px 10px;
-            font-family: "Changa", sans-serif;
-            font-size: 12px;
-            font-weight: bold;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            white-space: nowrap;
-        `;
 
         // Create checkbox inside button
         var heatmapCheckbox = L.DomUtil.create("input", "", heatmapBtn);
@@ -183,6 +169,40 @@ var LayerControl = L.Control.extend({
 });
 
 new LayerControl().addTo(mymap);
+
+// ========== RANDOM STORY FINDER CONTROL ========== //
+var StoryFinderControl = L.Control.extend({
+    options: { position: "topleft" },
+    onAdd: function (map) {
+        var button = L.DomUtil.create("button", "story-finder-btn");
+        button.innerHTML = "Find a photo/story";
+        button.title = "Find a random show with photos or stories";
+
+        // Add hover effects
+        button.addEventListener("mouseenter", function () {
+            this.style.transform = "scale(1.03)";
+            this.style.backgroundColor = "rgb(218,126,53)";
+            this.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+        });
+
+        button.addEventListener("mouseleave", function () {
+            this.style.transform = "scale(1)";
+            this.style.backgroundColor = "rgb(208, 113, 38)";
+            this.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+        });
+
+        // Click handler
+        button.addEventListener("click", function (e) {
+            e.stopPropagation();
+            findRandomStory();
+        });
+
+        return button;
+    }
+});
+
+// Add the control to the map
+new StoryFinderControl().addTo(mymap);
 
 // ========== GLOBAL VARIABLES ========== //
 var markersByYear = {};
@@ -399,6 +419,223 @@ function showTemporaryNotification(message) {
     setTimeout(function () {
         if (notification.parentNode) notification.parentNode.removeChild(notification);
     }, 2000);
+}
+
+// ========== RANDOM STORY FINDER ========== //
+// Track the last selected show to avoid repeats
+let lastSelectedShowID = null;
+
+async function findRandomStory() {
+    // Make sure all data is loaded first
+    if (!window.showsData) {
+        return;
+    }
+    
+    // Load photos and stories if not already loaded
+    if (!allPhotosCache) {
+        await loadAllPhotos();
+    }
+    
+    if (!allStoriesCache) {
+        await loadAllStories();
+    }
+
+    // Get currently visible years from the filter
+    const visibleYearsArray = Array.from(visibleYears);
+    
+    // If no years are selected, return
+    if (visibleYearsArray.length === 0) {
+        return;
+    }
+
+    // Filter shows to only those from visible years
+    const visibleShows = window.showsData.filter(show => {
+        const yearStr = show.Year.toString();
+        return visibleYearsArray.includes(yearStr);
+    });
+
+    if (visibleShows.length === 0) {
+        return;
+    }
+
+    // Now check for shows with media among the visible shows
+    let showsWithMedia = visibleShows.filter(show => {
+        const paddedID = show.ID.toString().padStart(4, "0");
+        // Check if show has photos or stories
+        const hasPhotos = allPhotosCache && allPhotosCache.some(filename => filename.startsWith(paddedID));
+        const hasStories = allStoriesCache && allStoriesCache[paddedID] && allStoriesCache[paddedID].length > 0;
+        return hasPhotos || hasStories;
+    });
+
+    if (showsWithMedia.length === 0) {
+        return;
+    }
+
+    // If there's more than one show with media, remove the last one shown
+    if (showsWithMedia.length > 1 && lastSelectedShowID !== null) {
+        showsWithMedia = showsWithMedia.filter(show => show.ID !== lastSelectedShowID);
+        
+        // If filtering removed all shows (should only happen if there was only 1 show with media), use the full list again
+        if (showsWithMedia.length === 0) {
+            showsWithMedia = visibleShows.filter(show => {
+                const paddedID = show.ID.toString().padStart(4, "0");
+                const hasPhotos = allPhotosCache && allPhotosCache.some(filename => filename.startsWith(paddedID));
+                const hasStories = allStoriesCache && allStoriesCache[paddedID] && allStoriesCache[paddedID].length > 0;
+                return hasPhotos || hasStories;
+            });
+        }
+    }
+
+    // Pick a random show from the filtered list
+    const randomIndex = Math.floor(Math.random() * showsWithMedia.length);
+    const selectedShow = showsWithMedia[randomIndex];
+    
+    // Store the selected show ID to avoid repeats
+    lastSelectedShowID = selectedShow.ID;
+
+    // First, zoom to the show location (this will also zoom out of any clusters)
+    mymap.setView([selectedShow.Latitude, selectedShow.Longitude], 18);
+
+    // Wait for the map to finish zooming and for clusters to update
+    setTimeout(() => {
+        // Function to find and open the marker
+        function findAndOpenMarker() {
+            let markerFound = false;
+            
+            // First check if clusters are enabled
+            if (clusterEnabled && clusterLayer) {
+                // Try to find the marker within the cluster and check if the marker is in the cluster
+                allMarkers.forEach(marker => {
+                    const latLng = marker.getLatLng();
+                    const popupContent = marker.getPopup().getContent();
+                    
+                    // Check if this marker matches the selected show
+                    if (popupContent.includes(selectedShow.Venue) && 
+                        popupContent.includes(selectedShow.City) &&
+                        popupContent.includes(selectedShow.Year.toString())) {
+                        
+                        // Check if the marker is currently visible (not in a hidden cluster) and try to open it directly
+                        try {
+                            // If the marker is in a cluster, force the cluster to open
+                            const allLayers = markerClusterGroup.getLayers();
+                            const markerInCluster = allLayers.some(layer => {
+                                // Check if this is the marker we want
+                                if (layer === marker) return true;
+                                // If it's a cluster, check if it contains our marker
+                                if (layer.getChildCount && layer.getAllChildMarkers) {
+                                    const childMarkers = layer.getAllChildMarkers();
+                                    return childMarkers.includes(marker);
+                                }
+                                return false;
+                            });
+                            
+                            if (markerInCluster) {
+                                // The marker is in a cluster - need to zoom in more
+                                const currentZoom = mymap.getZoom();
+                                if (currentZoom < 18) {
+                                    mymap.setView([selectedShow.Latitude, selectedShow.Longitude], currentZoom + 1);
+                                    // Try again after zoom
+                                    setTimeout(() => {
+                                        try {
+                                            marker.openPopup();
+                                            markerFound = true;
+                                        } catch (e) {
+                                            console.log("Could not open popup after zoom");
+                                        }
+                                    }, 400);
+                                } else {
+                                    // Already at high zoom, try to open directly
+                                    try {
+                                        marker.openPopup();
+                                        markerFound = true;
+                                    } catch (e) {
+                                        console.log("Could not open popup at high zoom");
+                                    }
+                                }
+                            } else {
+                                // Marker is not in a cluster, open directly
+                                try {
+                                    marker.openPopup();
+                                    markerFound = true;
+                                } catch (e) {
+                                    console.log("Could not open popup directly");
+                                }
+                            }
+                        } catch (e) {
+                            console.log("Error opening marker:", e);
+                        }
+                    }
+                });
+            } else {
+                // Clusters are disabled, search through all markers directly
+                allMarkers.forEach(marker => {
+                    const popupContent = marker.getPopup().getContent();
+                    if (popupContent.includes(selectedShow.Venue) && 
+                        popupContent.includes(selectedShow.City) &&
+                        popupContent.includes(selectedShow.Year.toString())) {
+                        try {
+                            marker.openPopup();
+                            markerFound = true;
+                        } catch (e) {
+                            console.log("Could not open popup:", e);
+                        }
+                    }
+                });
+            }
+            
+            // If we couldn't find the exact marker, try by location
+            if (!markerFound) {
+                allMarkers.forEach(marker => {
+                    const latLng = marker.getLatLng();
+                    if (Math.abs(latLng.lat - selectedShow.Latitude) < 0.001 && 
+                        Math.abs(latLng.lng - selectedShow.Longitude) < 0.001) {
+                        try {
+                            marker.openPopup();
+                            markerFound = true;
+                        } catch (e) {
+                            console.log("Could not open popup by location:", e);
+                        }
+                    }
+                });
+            }
+
+            if (!markerFound) {
+                console.log("Could not find the marker for this show, but zoomed to its location!");
+            }
+        }
+
+        // Try to find and open the marker
+        findAndOpenMarker();
+        
+        // If the marker wasn't found after the first attempt, try again after a short delay
+        // (this helps if the cluster needs time to update after zooming)
+        setTimeout(() => {
+            // Check if a popup is already open
+            if (!mymap.getPopup() || !mymap.getPopup().isOpen()) {
+                // Try one more time with a different approach
+                allMarkers.forEach(marker => {
+                    const latLng = marker.getLatLng();
+                    // Check by location with a slightly larger tolerance
+                    if (Math.abs(latLng.lat - selectedShow.Latitude) < 0.005 && 
+                        Math.abs(latLng.lng - selectedShow.Longitude) < 0.005) {
+                        try {
+                            // Force the map to zoom to the exact location
+                            mymap.setView([selectedShow.Latitude, selectedShow.Longitude], 18);
+                            setTimeout(() => {
+                                try {
+                                    marker.openPopup();
+                                } catch (e) {
+                                    console.log("Final attempt failed:", e);
+                                }
+                            }, 300);
+                        } catch (e) {
+                            console.log("Final attempt failed:", e);
+                        }
+                    }
+                });
+            }
+        }, 800);
+    }, 500);
 }
 
 // ========== FILTERING FUNCTIONS ========== //
@@ -757,7 +994,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("close-splash").addEventListener("click", closeSplash);
 
     showPage(1);
+    
+    // Load all data
     loadShowsData();
+    // Load photos and stories in the background
+    loadAllPhotos().then(() => console.log("Photos loaded"));
+    loadAllStories().then(() => console.log("Stories loaded"));
 
     // Photo gallery listeners
     document
