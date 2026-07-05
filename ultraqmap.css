@@ -226,8 +226,6 @@ input[type="checkbox"]:checked::after {
     border-radius: 4px;
     width: 33px;
     height: 33px;
-    top: -5px;
-    left: 0;
     cursor: pointer;
 }
 
@@ -699,8 +697,8 @@ input[type="checkbox"]:checked::after {
 
 /* Layer Control Panel */
 .layer-control-container {
-    top: -116px;
-    left: 38px;
+    top: -151px;
+    left: 36px;
     background-color: white;
     border: solid rgba(0, 0, 0, 0.2) 2px;
     border-radius: 4px;
@@ -733,14 +731,14 @@ input[type="checkbox"]:checked::after {
 
 /* Story Finder Button */
 .story-finder-btn {
-    top: -122px;
-    left: 40px;
+    top: -157px;
+    left: 37px;
     background-color: rgb(208, 113, 38);
     color: white;
     font-family: "Changa", sans-serif;
     font-weight: bold;
     font-size: 12px;
-    padding: 4px 10px;
+    padding: 4px 15px;
     border: 2px solid rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     cursor: pointer;
@@ -754,9 +752,160 @@ input[type="checkbox"]:checked::after {
 }
 
 .story-finder-btn:hover {
-    transform: scale(1.02);
     background-color: rgb(218,126,53);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Custom control container for stacked buttons */
+.custom-control-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    top: -6px;
+}
+
+/* Help button styling */
+.custom-help-button {
+    background-color: white;
+    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border-radius: 4px;
+    width: 33px;
+    height: 33px;
+    cursor: pointer;
+    font-family: "Changa", sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(11, 59, 56);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.custom-help-button:hover {
+    background-color: rgb(11, 59, 56);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Help Popup Styles */
+#help-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    animation: helpFadeIn 0.3s ease-out;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#help-popup .help-content {
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px 35px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: helpFadeInUp 0.3s ease-out;
+    font-family: "Changa", sans-serif;
+}
+
+#help-popup .help-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #666;
+    padding: 5px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+#help-popup .help-close-btn:hover {
+    color: #000;
+}
+
+#help-popup .help-title {
+    color: rgb(11, 59, 56);
+    font-family: "Changa", sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    margin-top: 0;
+}
+
+#help-popup .help-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+#help-popup .help-text a,
+#help-popup .help-divider a,
+#help-popup .help-footer a {
+    color: rgb(208, 113, 38);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+#help-popup .help-text a:hover,
+#help-popup .help-divider a:hover,
+#help-popup .help-footer a:hover {
+    color: #e29b64;
+    text-decoration: underline;
+}
+
+#help-popup .help-divider {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #666;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+#help-popup .help-got-it-btn {
+    font-family: "Changa", sans-serif;
+    background-color: rgb(11, 59, 56);
+    color: white;
+    border: none;
+    padding: 8px 30px;
+    font-size: 1.1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 15px;
+    display: block;
+    width: 100%;
+}
+
+#help-popup .help-got-it-btn:hover {
+    background-color: rgb(17, 92, 87);
+    transform: scale(1.02);
+}
+
+/* Help Popup Animations */
+@keyframes helpFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes helpFadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* Mobile responsiveness */
@@ -889,6 +1038,24 @@ input[type="checkbox"]:checked::after {
         font-size: 11px;
         padding: 4px 10px;
     } 
+    #help-popup .help-content {
+        padding: 20px 25px;
+        max-width: 100%;
+        margin: 10px;
+    }
+    
+    #help-popup .help-title {
+        font-size: 1.4rem;
+    }
+    
+    #help-popup .help-text {
+        font-size: 0.9rem;
+    }
+    
+    #help-popup .help-got-it-btn {
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
 }
 
 .leaflet-bottom {

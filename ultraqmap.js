@@ -9,19 +9,79 @@ var streets = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{
     maxZoom: 20
 }).addTo(mymap);
 
-// Create reset view button
+// Create reset view button with help button below it
 var ZoomOutControl = L.Control.extend({
     options: { position: "topleft" },
     onAdd: function (map) {
-        var button = L.DomUtil.create("button", "custom-button");
+        var container = L.DomUtil.create("div", "custom-control-container");
+
+        // Reset view button
+        var button = L.DomUtil.create("button", "custom-button", container);
         button.title = "Reset view";
         button.onclick = function () {
             map.setView([38, -40], 3);
         };
-        return button;
+        
+        // Help button
+        var helpButton = L.DomUtil.create("button", "custom-help-button", container);
+        helpButton.textContent = "?";
+        helpButton.title = "About this map";
+        helpButton.onclick = function (e) {
+            e.stopPropagation();
+            showHelpPopup();
+        };
+
+        return container;
     }
 });
 new ZoomOutControl().addTo(mymap);
+
+// ========== HELP POPUP ========== //
+function showHelpPopup() {
+    // Remove existing help popup if any
+    const existingPopup = document.getElementById("help-popup");
+    if (existingPopup) {
+        existingPopup.remove();
+        return;
+    }
+
+    const popup = document.createElement("div");
+    popup.id = "help-popup";
+
+    const content = document.createElement("div");
+    content.className = "help-content";
+
+    content.innerHTML = `
+        <button class="help-close-btn">×</button>
+        <h2 class="help-title">About This Map</h2>
+        <p class="help-text">Welcome to the <strong>Ultra Q Map</strong>! This is an interactive web map tracking every past Ultra Q show.</p>
+        <p class="help-text">I'm incorporating pictures and stories from showgoers to document their experiences at these shows, so if you have something you'd like to share, send me an email or fill out this <strong><a href="https://docs.google.com/forms/d/e/1FAIpQLSerjweiGwejyVxnbYcIk_LWk8W_3PQZixh8N9DtJifwg9Qn2w/viewform?usp=header" target="_blank" rel="noopener norefferer">Google Form</a></strong>!</p>
+        <p class="help-text">The web map uses a cartographic technique called Donut Clustering, where each color in the cluster’s ring represents the year the show took place. Zoom in, and the clusters expand into individual markers.</p>
+        <p class="help-text">In the top left corner are zoom controls and a button to reset the map view to its starting zoom level. You’ll also find controls to turn on and off the <strong>Donut Clusters</strong> and <strong>Heat Map</strong> layers of the map. The Heat Map layer visualizes the density of Ultra Q shows across North America and Europe, updating based on which years are selected.</p>
+        <p class="help-text">Underneath these layer controls is the <strong>"Find a photo/story"</strong> button which, when clicked, automatically zooms to a randomized show that has had photos and/or stories submitted for it.</p>
+        <p class="help-text">In the top right corner of the map is a <strong>layer control</strong> box where shows can be filtered by year. Only show markers from years that are selected will show up on the map.</p>
+        <p class="help-text">The bottom left corner shows the <strong>Top 5 Cities</strong> where Ultra Q have had shows. This stats panel updates depending on which years are selected to appear on the map.</p>
+        <p class="help-divider">If you have any suggestions on ways to improve or things to add to the map, let me know via email <strong style="color: rgb(208, 113, 38)">(ultraqmap@gmail.com)</strong>, or send me a message on Instagram <strong style="color: rgb(208, 113, 38)">(<a href="https://www.instagram.com/ultraqmap/" target="_blank" rel="noopener noreferrer">@ultraqmap</a>)</strong>!</p>
+        <button class="help-got-it-btn">Got it!</button>
+    `;
+
+    popup.appendChild(content);
+    document.body.appendChild(popup);
+
+    // Close handlers
+    const closeBtn = content.querySelector(".help-close-btn");
+    const gotItBtn = content.querySelector(".help-got-it-btn");
+
+    function closeHelp() {
+        popup.remove();
+    }
+
+    closeBtn.addEventListener("click", closeHelp);
+    gotItBtn.addEventListener("click", closeHelp);
+    popup.addEventListener("click", function (e) {
+        if (e.target === this) closeHelp();
+    });
+}
 
 // Create locator (inset) map
 var miniMap = new L.Control.MiniMap(L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"), {
@@ -58,7 +118,6 @@ var LayerControl = L.Control.extend({
         clusterBtn.style.cssText = `
             padding: 5px 10px;
             font-family: "Changa", sans-serif;
-            font-size: 12px;
             font-weight: bold;
             border: none;
             border-radius: 3px;
@@ -180,7 +239,6 @@ var StoryFinderControl = L.Control.extend({
 
         // Add hover effects
         button.addEventListener("mouseenter", function () {
-            this.style.transform = "scale(1.03)";
             this.style.backgroundColor = "rgb(218,126,53)";
             this.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
         });
