@@ -189,7 +189,7 @@ input[type="checkbox"]:checked::after {
     font-weight: bold;
 }
 
-/* Specific styling for year filter checkboxes to maintain their original behavior */
+/* Specific styling for year filter checkboxes */
 #year-control input[type="checkbox"] {
     width: auto;
     height: auto;
@@ -731,16 +731,16 @@ input[type="checkbox"]:checked::after {
     opacity: 0.95;
 }
 
-/* Story Finder Button - Standalone */
+/* Story Finder Button */
 .story-finder-btn {
     top: -122px;
-    left: 39px;
+    left: 40px;
     background-color: rgb(208, 113, 38);
     color: white;
     font-family: "Changa", sans-serif;
     font-weight: bold;
-    font-size: 13px;
-    padding: 4px 11px;
+    font-size: 12px;
+    padding: 4px 10px;
     border: 2px solid rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     cursor: pointer;
