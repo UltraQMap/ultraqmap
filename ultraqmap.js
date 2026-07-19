@@ -1,5 +1,5 @@
 // Set up the map
-var mymap = L.map("map").setView([38, -40], 3);
+var mymap = L.map("map").setView([40, -42], 3);
 
 // Add basemaps
 var streets = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
@@ -21,7 +21,7 @@ var ZoomOutControl = L.Control.extend({
         button.onclick = function () {
             map.setView([38, -40], 3);
         };
-        
+
         // Help button
         var helpButton = L.DomUtil.create("button", "custom-help-button", container);
         helpButton.textContent = "?";
@@ -56,9 +56,11 @@ function showHelpPopup() {
         <h2 class="help-title">About This Map</h2>
         <p class="help-text">Welcome to the <strong>Ultra Q Map</strong>! This is an interactive web map tracking every past Ultra Q show.</p>
         <p class="help-text">I'm incorporating pictures and stories from showgoers to document their experiences at these shows, so if you have something you'd like to share, send me an email or fill out this <strong><a href="https://docs.google.com/forms/d/e/1FAIpQLSerjweiGwejyVxnbYcIk_LWk8W_3PQZixh8N9DtJifwg9Qn2w/viewform?usp=header" target="_blank" rel="noopener norefferer">Google Form</a></strong>!</p>
-        <p class="help-text">The web map uses a cartographic technique called Donut Clustering, where each color in the cluster’s ring represents the year the show took place. Zoom in, and the clusters expand into individual markers.</p>
-        <p class="help-text">In the top left corner are zoom controls and a button to reset the map view to its starting zoom level. You’ll also find controls to turn on and off the <strong>Donut Clusters</strong> and <strong>Heat Map</strong> layers of the map. The Heat Map layer visualizes the density of Ultra Q shows across North America and Europe, updating based on which years are selected.</p>
-        <p class="help-text">Underneath these layer controls is the <strong>"Find a photo/story"</strong> button which, when clicked, automatically zooms to a randomized show that has had photos and/or stories submitted for it.</p>
+        <p class="help-text">The web map uses a cartographic technique called Donut Clustering, where each color in the cluster's ring represents the year the show took place. Zoom in, and the clusters expand into individual markers.</p>
+        <p class="help-text">In the top left corner are zoom controls and a button to reset the map view to its starting zoom level. You'll also find controls to turn on and off the <strong>Donut Clusters</strong> and <strong>Heat Map</strong> layers of the map. The Heat Map layer visualizes the density of Ultra Q shows across North America and Europe, updating based on which years are selected.</p>
+        <p class="help-text">Underneath these layer controls is the <strong>"Find Photos/Stories"</strong> button which, when clicked, automatically zooms to a randomized show that has had photos and/or stories submitted for it.</p>
+        <p class="help-text">Below that is the <strong>"Submit Photos/Stories"</strong> button which opens a Google Form where you can share your concert experiences.</p>
+        <p class="help-text">Next is the <strong>"Today in UQ History"</strong> button which shows all shows that happened on this date in past years.</p>
         <p class="help-text">In the top right corner of the map is a <strong>layer control</strong> box where shows can be filtered by year. Only show markers from years that are selected will show up on the map.</p>
         <p class="help-text">The bottom left corner shows the <strong>Top 5 Cities</strong> where Ultra Q have had shows. This stats panel updates depending on which years are selected to appear on the map.</p>
         <p class="help-divider">If you have any suggestions on ways to improve or things to add to the map, let me know via email <strong style="color: rgb(208, 113, 38)">(ultraqmap@gmail.com)</strong>, or send me a message on Instagram <strong style="color: rgb(208, 113, 38)">(<a href="https://www.instagram.com/ultraqmap/" target="_blank" rel="noopener noreferrer">@ultraqmap</a>)</strong>!</p>
@@ -83,11 +85,51 @@ function showHelpPopup() {
     });
 }
 
+// Temporary notification helper
+function showTemporaryNotification(message) {
+    var notification = document.createElement("div");
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: rgba(11, 59, 56, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-family: "Changa", sans-serif;
+        font-size: 14px;
+        z-index: 2000;
+        animation: fadeOut 2s ease forwards;
+        pointer-events: none;
+        max-width: 300px;
+        text-align: center;
+    `;
+
+    if (!document.querySelector("#fade-out-animation")) {
+        var style = document.createElement("style");
+        style.id = "fade-out-animation";
+        style.textContent = `
+            @keyframes fadeOut {
+                0% { opacity: 1; transform: translateY(0); }
+                70% { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-10px); visibility: hidden; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.body.appendChild(notification);
+    setTimeout(function () {
+        if (notification.parentNode) notification.parentNode.removeChild(notification);
+    }, 3000);
+}
+
 // Create locator (inset) map
 var miniMap = new L.Control.MiniMap(L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"), {
     toggleDisplay: true,
     position: "bottomright",
-    zoomLevelOffset: -5
+    zoomLevelOffset: -6
 }).addTo(mymap);
 
 // Add a scale bar to the map
@@ -234,7 +276,7 @@ var StoryFinderControl = L.Control.extend({
     options: { position: "topleft" },
     onAdd: function (map) {
         var button = L.DomUtil.create("button", "story-finder-btn");
-        button.innerHTML = "Find a photo/story";
+        button.innerHTML = "Find Photos/Stories";
         button.title = "Find a random show with photos or stories";
 
         // Add hover effects
@@ -261,6 +303,321 @@ var StoryFinderControl = L.Control.extend({
 
 // Add the control to the map
 new StoryFinderControl().addTo(mymap);
+
+// ========== SUBMIT PHOTO/STORY CONTROL ========== //
+var SubmitControl = L.Control.extend({
+    options: { position: "topleft" },
+    onAdd: function (map) {
+        var button = L.DomUtil.create("button", "story-finder-btn submit-btn");
+        button.innerHTML = "Submit Photos/Stories";
+        button.title = "Submit your concert photos and stories";
+        button.style.backgroundColor = "rgb(208, 113, 38)";
+        button.style.color = "white";
+
+        // Add hover effects
+        button.addEventListener("mouseenter", function () {
+            this.style.backgroundColor = "rgb(218,126,53)";
+            this.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+        });
+
+        button.addEventListener("mouseleave", function () {
+            this.style.transform = "scale(1)";
+            this.style.backgroundColor = "rgb(208, 113, 38)";
+            this.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+        });
+
+        // Click handler - open the Google Form in a new tab
+        button.addEventListener("click", function (e) {
+            e.stopPropagation();
+            window.open("https://docs.google.com/forms/d/e/1FAIpQLSerjweiGwejyVxnbYcIk_LWk8W_3PQZixh8N9DtJifwg9Qn2w/viewform?usp=sharing&ouid=115915436845269291117", "_blank");
+        });
+
+        return button;
+    }
+});
+
+// Add the control to the map
+new SubmitControl().addTo(mymap);
+
+// ========== ANNIVERSARY REMINDER CONTROL ========== //
+var AnniversaryControl = L.Control.extend({
+    options: { position: "topleft" },
+    onAdd: function (map) {
+        var button = L.DomUtil.create("button", "story-finder-btn anniversary-btn");
+        button.innerHTML = "Today in UQ History";
+        button.title = "See shows that happened on this date in previous years";
+        button.style.backgroundColor = "rgb(208, 113, 38)";
+        button.style.color = "white";
+
+        // Add hover effects
+        button.addEventListener("mouseenter", function () {
+            this.style.backgroundColor = "rgb(218,126,53)";
+            this.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+        });
+
+        button.addEventListener("mouseleave", function () {
+            this.style.transform = "scale(1)";
+            this.style.backgroundColor = "rgb(208, 113, 38)";
+            this.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+        });
+
+        // Click handler
+        button.addEventListener("click", function (e) {
+            e.stopPropagation();
+            showAnniversaryReminders();
+        });
+
+        return button;
+    }
+});
+
+// Add the control to the map
+new AnniversaryControl().addTo(mymap);
+
+// ========== ANNIVERSARY REMINDER FUNCTIONALITY ========== //
+function showAnniversaryReminders() {
+    if (!window.showsData) {
+        console.error("Show data not loaded");
+        return;
+    }
+
+    const today = new Date();
+    const todayMonth = today.getMonth() + 1; // JavaScript months are 0-indexed
+    const todayDay = today.getDate();
+
+    // Get month name
+    const monthNames = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
+    const monthName = monthNames[today.getMonth()];
+
+    // Find shows that happened on this date in any year
+    const anniversaryShows = window.showsData.filter((show) => {
+        // Parse the show date
+        const monthIndex = monthNames.indexOf(show.Month);
+        const showMonth = monthIndex + 1;
+        const showDay = parseInt(show.Day);
+
+        return showMonth === todayMonth && showDay === todayDay;
+    });
+
+    // Sort by year (most recent first)
+    anniversaryShows.sort((a, b) => b.Year - a.Year);
+
+    // Create the modal
+    const existingModal = document.getElementById("anniversary-modal");
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const modal = document.createElement("div");
+    modal.id = "anniversary-modal";
+    modal.className = "modal";
+    modal.style.display = "block";
+    modal.style.zIndex = "10000";
+
+    const content = document.createElement("div");
+    content.className = "modal-content";
+    content.style.maxWidth = "700px";
+    content.style.maxHeight = "80vh";
+    content.style.overflowY = "auto";
+    content.style.position = "relative";
+
+    // Build the content
+    let html = `
+        <span class="close-anniversary" style="position:absolute;right:10px;top:5px;font-size:28px;cursor:pointer;color:#333;">&times;</span>
+        <h2 style="color:rgb(11,59,56);font-family:'Changa',sans-serif;margin-bottom:5px;font-size:1.8rem;">Today in UQ History</h2>
+        <p style="color:#666;font-family:'Changa',sans-serif;font-size:1rem;margin-bottom:15px;">${monthName} ${todayDay} — Shows on this date in past years</p>
+    `;
+
+    if (anniversaryShows.length === 0) {
+        html += `
+            <div style="text-align:center;padding:30px 0;font-family:'Changa',sans-serif;color:#666;">
+                <p style="font-size:1.1rem;">No shows on this date yet!</p>
+                <p style="font-size:0.9rem;margin-top:5px;">Check back another day for more Ultra Q history.</p>
+            </div>
+        `;
+    } else {
+        // Group by year for display
+        const years = [...new Set(anniversaryShows.map((s) => s.Year))].sort((a, b) => b - a);
+
+        html += `<div style="margin-top:10px;">`;
+
+        years.forEach((year) => {
+            const showsInYear = anniversaryShows.filter((s) => s.Year === year);
+            const yearsAgo = new Date().getFullYear() - year;
+            const yearLabel = yearsAgo === 0 ? "This year!" : `${yearsAgo} year${yearsAgo > 1 ? "s" : ""} ago`;
+
+            html += `
+                <div style="margin-bottom:15px;border-left:4px solid rgb(208,113,38);padding-left:12px;">
+                    <h4 style="color:rgb(11,59,56);font-family:'Changa',sans-serif;margin:0 0 4px 0;font-size:1.1rem;">
+                        ${year} — ${yearLabel}
+                    </h4>
+            `;
+
+            showsInYear.forEach((show) => {
+                const location =
+                    show.State && show.State !== "" ? `${show.City}, ${show.State}` : `${show.City}, ${show.Country}`;
+
+                // Check if show has photos or stories
+                const paddedID = show.ID.toString().padStart(4, "0");
+                const hasPhotos = allPhotosCache && allPhotosCache.some((f) => f.startsWith(paddedID));
+                const hasStories = allStoriesCache && allStoriesCache[paddedID] && allStoriesCache[paddedID].length > 0;
+
+                let mediaBadges = "";
+                if (hasPhotos)
+                    mediaBadges += `<span style="background:#23bdb4;color:white;padding:1px 8px;border-radius:12px;font-size:10px;margin-right:4px;">📷</span>`;
+                if (hasStories)
+                    mediaBadges += `<span style="background:#bd6623;color:white;padding:1px 8px;border-radius:12px;font-size:10px;">📖</span>`;
+
+                html += `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0;font-family:'Changa',sans-serif;font-size:0.95rem;">
+                        <span>
+                            <strong>${show.Venue}</strong> — ${location}
+                            ${mediaBadges}
+                        </span>
+                        <button onclick="window.zoomToShow('${show.ID}', '${show.Venue}', ${show.Latitude}, ${show.Longitude}, '${show.City}', ${show.Year})" style="background:rgb(11,59,56);color:white;border:none;padding:2px 12px;border-radius:4px;cursor:pointer;font-family:'Changa',sans-serif;font-size:0.8rem;white-space:nowrap;">
+                            Map →
+                        </button>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+        });
+
+        html += `</div>`;
+    }
+
+    content.innerHTML = html;
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+
+    // Close handlers
+    const closeBtn = content.querySelector(".close-anniversary");
+    const closeModal = () => {
+        modal.remove();
+    };
+
+    closeBtn.addEventListener("click", closeModal);
+    modal.addEventListener("click", function (e) {
+        if (e.target === this) closeModal();
+    });
+
+    // Also close with Escape key
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+            const modal = document.getElementById("anniversary-modal");
+            if (modal) modal.remove();
+        }
+    });
+}
+
+// ========== GLOBAL ZOOM TO SHOW FUNCTION ========== //
+// Make this function globally accessible for the onclick handler in the anniversary modal
+window.zoomToShow = function(showID, venue, lat, lng, city, year) {
+    if (!window.showsData) {
+        console.error("Show data not loaded");
+        return;
+    }
+
+    // Find the show data
+    let show = window.showsData.find((s) => s.ID === showID);
+    if (!show) {
+        // If we have the data passed directly, use it
+        if (lat && lng) {
+            show = { ID: showID, Venue: venue || "", City: city || "", Year: year || "", Latitude: lat, Longitude: lng };
+        } else {
+            console.error("Show not found:", showID);
+            return;
+        }
+    }
+
+    // Close the anniversary modal
+    const modal = document.getElementById("anniversary-modal");
+    if (modal) modal.remove();
+
+    // Zoom to the show location
+    mymap.setView([show.Latitude, show.Longitude], 18);
+
+    // Try to find and open the marker
+    setTimeout(() => {
+        let markerFound = false;
+
+        // First try to find by exact location match
+        allMarkers.forEach((marker) => {
+            const latLng = marker.getLatLng();
+            if (Math.abs(latLng.lat - show.Latitude) < 0.0005 &&
+                Math.abs(latLng.lng - show.Longitude) < 0.0005) {
+                try {
+                    marker.openPopup();
+                    markerFound = true;
+                    console.log("Marker found and opened by location");
+                } catch (e) {
+                    console.log("Could not open popup:", e);
+                }
+            }
+        });
+
+        // If not found, try by matching popup content
+        if (!markerFound) {
+            allMarkers.forEach((marker) => {
+                const popupContent = marker.getPopup().getContent();
+                if (popupContent) {
+                    // Check if this marker matches the show
+                    const venueMatch = show.Venue && popupContent.includes(show.Venue);
+                    const cityMatch = show.City && popupContent.includes(show.City);
+                    const yearMatch = show.Year && popupContent.includes(show.Year.toString());
+                    
+                    if (venueMatch || (cityMatch && yearMatch)) {
+                        try {
+                            marker.openPopup();
+                            markerFound = true;
+                            console.log("Marker found and opened by popup content");
+                        } catch (e) {
+                            console.log("Could not open popup:", e);
+                        }
+                    }
+                }
+            });
+        }
+
+        // If still not found, try to find by coordinates with a larger tolerance
+        if (!markerFound) {
+            allMarkers.forEach((marker) => {
+                const latLng = marker.getLatLng();
+                if (Math.abs(latLng.lat - show.Latitude) < 0.01 &&
+                    Math.abs(latLng.lng - show.Longitude) < 0.01) {
+                    try {
+                        marker.openPopup();
+                        markerFound = true;
+                        console.log("Marker found and opened by approximate location");
+                    } catch (e) {
+                        console.log("Could not open popup:", e);
+                    }
+                }
+            });
+        }
+
+        if (!markerFound) {
+            console.log("Could not find the marker for this show, but zoomed to its location!");
+            // Show a temporary notification
+            const displayName = show.Venue || show.City || "show";
+            showTemporaryNotification(`📍 ${displayName} — ${show.City || ""} ${show.Year || ""}`);
+        }
+    }, 800);
+};
 
 // ========== GLOBAL VARIABLES ========== //
 var markersByYear = {};
@@ -441,44 +798,6 @@ function generateHeatmapData(showsData) {
     return heatPoints;
 }
 
-// Temporary notification helper
-function showTemporaryNotification(message) {
-    var notification = document.createElement("div");
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background-color: rgba(11, 59, 56, 0.9);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 25px;
-        font-family: "Changa", sans-serif;
-        font-size: 14px;
-        z-index: 2000;
-        animation: fadeOut 2s ease forwards;
-        pointer-events: none;
-    `;
-
-    if (!document.querySelector("#fade-out-animation")) {
-        var style = document.createElement("style");
-        style.id = "fade-out-animation";
-        style.textContent = `
-            @keyframes fadeOut {
-                0% { opacity: 1; transform: translateY(0); }
-                70% { opacity: 1; transform: translateY(0); }
-                100% { opacity: 0; transform: translateY(-10px); visibility: hidden; }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    document.body.appendChild(notification);
-    setTimeout(function () {
-        if (notification.parentNode) notification.parentNode.removeChild(notification);
-    }, 2000);
-}
-
 // ========== RANDOM STORY FINDER ========== //
 // Track the last selected show to avoid repeats
 let lastSelectedShowID = null;
@@ -488,26 +807,26 @@ async function findRandomStory() {
     if (!window.showsData) {
         return;
     }
-    
+
     // Load photos and stories if not already loaded
     if (!allPhotosCache) {
         await loadAllPhotos();
     }
-    
+
     if (!allStoriesCache) {
         await loadAllStories();
     }
 
     // Get currently visible years from the filter
     const visibleYearsArray = Array.from(visibleYears);
-    
+
     // If no years are selected, return
     if (visibleYearsArray.length === 0) {
         return;
     }
 
     // Filter shows to only those from visible years
-    const visibleShows = window.showsData.filter(show => {
+    const visibleShows = window.showsData.filter((show) => {
         const yearStr = show.Year.toString();
         return visibleYearsArray.includes(yearStr);
     });
@@ -517,10 +836,10 @@ async function findRandomStory() {
     }
 
     // Now check for shows with media among the visible shows
-    let showsWithMedia = visibleShows.filter(show => {
+    let showsWithMedia = visibleShows.filter((show) => {
         const paddedID = show.ID.toString().padStart(4, "0");
         // Check if show has photos or stories
-        const hasPhotos = allPhotosCache && allPhotosCache.some(filename => filename.startsWith(paddedID));
+        const hasPhotos = allPhotosCache && allPhotosCache.some((filename) => filename.startsWith(paddedID));
         const hasStories = allStoriesCache && allStoriesCache[paddedID] && allStoriesCache[paddedID].length > 0;
         return hasPhotos || hasStories;
     });
@@ -531,13 +850,13 @@ async function findRandomStory() {
 
     // If there's more than one show with media, remove the last one shown
     if (showsWithMedia.length > 1 && lastSelectedShowID !== null) {
-        showsWithMedia = showsWithMedia.filter(show => show.ID !== lastSelectedShowID);
-        
+        showsWithMedia = showsWithMedia.filter((show) => show.ID !== lastSelectedShowID);
+
         // If filtering removed all shows (should only happen if there was only 1 show with media), use the full list again
         if (showsWithMedia.length === 0) {
-            showsWithMedia = visibleShows.filter(show => {
+            showsWithMedia = visibleShows.filter((show) => {
                 const paddedID = show.ID.toString().padStart(4, "0");
-                const hasPhotos = allPhotosCache && allPhotosCache.some(filename => filename.startsWith(paddedID));
+                const hasPhotos = allPhotosCache && allPhotosCache.some((filename) => filename.startsWith(paddedID));
                 const hasStories = allStoriesCache && allStoriesCache[paddedID] && allStoriesCache[paddedID].length > 0;
                 return hasPhotos || hasStories;
             });
@@ -547,7 +866,7 @@ async function findRandomStory() {
     // Pick a random show from the filtered list
     const randomIndex = Math.floor(Math.random() * showsWithMedia.length);
     const selectedShow = showsWithMedia[randomIndex];
-    
+
     // Store the selected show ID to avoid repeats
     lastSelectedShowID = selectedShow.ID;
 
@@ -559,24 +878,25 @@ async function findRandomStory() {
         // Function to find and open the marker
         function findAndOpenMarker() {
             let markerFound = false;
-            
+
             // First check if clusters are enabled
             if (clusterEnabled && clusterLayer) {
                 // Try to find the marker within the cluster and check if the marker is in the cluster
-                allMarkers.forEach(marker => {
+                allMarkers.forEach((marker) => {
                     const latLng = marker.getLatLng();
                     const popupContent = marker.getPopup().getContent();
-                    
+
                     // Check if this marker matches the selected show
-                    if (popupContent.includes(selectedShow.Venue) && 
+                    if (
+                        popupContent.includes(selectedShow.Venue) &&
                         popupContent.includes(selectedShow.City) &&
-                        popupContent.includes(selectedShow.Year.toString())) {
-                        
+                        popupContent.includes(selectedShow.Year.toString())
+                    ) {
                         // Check if the marker is currently visible (not in a hidden cluster) and try to open it directly
                         try {
                             // If the marker is in a cluster, force the cluster to open
                             const allLayers = markerClusterGroup.getLayers();
-                            const markerInCluster = allLayers.some(layer => {
+                            const markerInCluster = allLayers.some((layer) => {
                                 // Check if this is the marker we want
                                 if (layer === marker) return true;
                                 // If it's a cluster, check if it contains our marker
@@ -586,7 +906,7 @@ async function findRandomStory() {
                                 }
                                 return false;
                             });
-                            
+
                             if (markerInCluster) {
                                 // The marker is in a cluster - need to zoom in more
                                 const currentZoom = mymap.getZoom();
@@ -626,11 +946,13 @@ async function findRandomStory() {
                 });
             } else {
                 // Clusters are disabled, search through all markers directly
-                allMarkers.forEach(marker => {
+                allMarkers.forEach((marker) => {
                     const popupContent = marker.getPopup().getContent();
-                    if (popupContent.includes(selectedShow.Venue) && 
+                    if (
+                        popupContent.includes(selectedShow.Venue) &&
                         popupContent.includes(selectedShow.City) &&
-                        popupContent.includes(selectedShow.Year.toString())) {
+                        popupContent.includes(selectedShow.Year.toString())
+                    ) {
                         try {
                             marker.openPopup();
                             markerFound = true;
@@ -640,13 +962,15 @@ async function findRandomStory() {
                     }
                 });
             }
-            
+
             // If we couldn't find the exact marker, try by location
             if (!markerFound) {
-                allMarkers.forEach(marker => {
+                allMarkers.forEach((marker) => {
                     const latLng = marker.getLatLng();
-                    if (Math.abs(latLng.lat - selectedShow.Latitude) < 0.001 && 
-                        Math.abs(latLng.lng - selectedShow.Longitude) < 0.001) {
+                    if (
+                        Math.abs(latLng.lat - selectedShow.Latitude) < 0.001 &&
+                        Math.abs(latLng.lng - selectedShow.Longitude) < 0.001
+                    ) {
                         try {
                             marker.openPopup();
                             markerFound = true;
@@ -664,18 +988,20 @@ async function findRandomStory() {
 
         // Try to find and open the marker
         findAndOpenMarker();
-        
+
         // If the marker wasn't found after the first attempt, try again after a short delay
         // (this helps if the cluster needs time to update after zooming)
         setTimeout(() => {
             // Check if a popup is already open
             if (!mymap.getPopup() || !mymap.getPopup().isOpen()) {
                 // Try one more time with a different approach
-                allMarkers.forEach(marker => {
+                allMarkers.forEach((marker) => {
                     const latLng = marker.getLatLng();
                     // Check by location with a slightly larger tolerance
-                    if (Math.abs(latLng.lat - selectedShow.Latitude) < 0.005 && 
-                        Math.abs(latLng.lng - selectedShow.Longitude) < 0.005) {
+                    if (
+                        Math.abs(latLng.lat - selectedShow.Latitude) < 0.005 &&
+                        Math.abs(latLng.lng - selectedShow.Longitude) < 0.005
+                    ) {
                         try {
                             // Force the map to zoom to the exact location
                             mymap.setView([selectedShow.Latitude, selectedShow.Longitude], 18);
@@ -1052,7 +1378,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("close-splash").addEventListener("click", closeSplash);
 
     showPage(1);
-    
+
     // Load all data
     loadShowsData();
     // Load photos and stories in the background
