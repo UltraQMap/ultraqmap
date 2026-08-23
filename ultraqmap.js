@@ -19,7 +19,7 @@ var ZoomOutControl = L.Control.extend({
         var button = L.DomUtil.create("button", "custom-button", container);
         button.title = "Reset view";
         button.onclick = function () {
-            map.setView([38, -40], 3);
+            map.setView([40, -42], 3);
         };
 
         // Help button
