@@ -177,6 +177,7 @@ input[type="checkbox"] {
     width: 16px;
     height: 16px;
     border: 2px solid rgb(11, 59, 56);
+    border: 2px solid rgb(11, 59, 56);
     border-radius: 3px;
     cursor: pointer;
     position: relative;
@@ -242,17 +243,23 @@ input[type="checkbox"]:checked::after {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: background-color 0.15s ease, transform 0.15s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-size: 76%;
     background-repeat: no-repeat;
     background-position: center;
     background-image: url("Images/globe_icon_teal.png");
+    will-change: transform;
+    backface-visibility: hidden;
 }
 .custom-button:hover {
     background-color: rgb(11, 59, 56);
     transform: scale(1.05);
     background-image: url("Images/globe_icon_white.png");
+}
+.custom-button:active {
+    transform: scale(0.92);
+    transition-duration: 0.05s;
 }
 
 #splash-modal {

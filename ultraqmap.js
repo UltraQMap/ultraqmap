@@ -15,11 +15,37 @@ var ZoomOutControl = L.Control.extend({
     onAdd: function (map) {
         var container = L.DomUtil.create("div", "custom-control-container");
 
-        // Reset view button
+        // Reset view button - UPDATED with flyTo
         var button = L.DomUtil.create("button", "custom-button", container);
         button.title = "Reset view";
+        
+        // Add loading state to prevent multiple clicks
+        var isResetting = false;
+        
         button.onclick = function () {
-            map.setView([40, -42], 3);
+            // Prevent multiple rapid clicks
+            if (isResetting) return;
+            isResetting = true;
+            
+            // Give visual feedback
+            button.style.opacity = '0.7';
+            button.style.transform = 'scale(0.95)';
+            
+            // Force map to recalculate its size for smoother rendering
+            map.invalidateSize();
+            
+            // Use flyTo for smooth animation instead of setView
+            map.flyTo([40, -42], 3, {
+                duration: 0.8,        // Animation duration in seconds
+                easeLinearity: 0.25    // Easing curve (0 = linear, 1 = ease out)
+            });
+            
+            // Reset button state after animation completes
+            setTimeout(function() {
+                button.style.opacity = '1';
+                button.style.transform = 'scale(1)';
+                isResetting = false;
+            }, 900); // Slightly longer than animation duration
         };
 
         // Help button
@@ -558,10 +584,13 @@ window.zoomToShow = function(showID, venue, lat, lng, city, year) {
     const modal = document.getElementById("anniversary-modal");
     if (modal) modal.remove();
 
-    // Zoom to the show location
-    mymap.setView([show.Latitude, show.Longitude], 18);
+    // Zoom to the show location - Updated to use flyTo
+    mymap.flyTo([show.Latitude, show.Longitude], 18, {
+        duration: 1.0,
+        easeLinearity: 0.25
+    });
 
-    // Try to find and open the marker
+    // Try to find and open the marker after animation completes
     setTimeout(() => {
         let markerFound = false;
 
@@ -626,7 +655,7 @@ window.zoomToShow = function(showID, venue, lat, lng, city, year) {
             const displayName = show.Venue || show.City || "show";
             showTemporaryNotification(`📍 ${displayName} — ${show.City || ""} ${show.Year || ""}`);
         }
-    }, 800);
+    }, 1200); // Slightly longer than flyTo duration
 };
 
 // ========== GLOBAL VARIABLES ========== //
@@ -880,8 +909,11 @@ async function findRandomStory() {
     // Store the selected show ID to avoid repeats
     lastSelectedShowID = selectedShow.ID;
 
-    // First, zoom to the show location (this will also zoom out of any clusters)
-    mymap.setView([selectedShow.Latitude, selectedShow.Longitude], 18);
+    // First, zoom to the show location using flyTo
+    mymap.flyTo([selectedShow.Latitude, selectedShow.Longitude], 18, {
+        duration: 1.0,
+        easeLinearity: 0.25
+    });
 
     // Wait for the map to finish zooming and for clusters to update
     setTimeout(() => {
@@ -921,7 +953,10 @@ async function findRandomStory() {
                                 // The marker is in a cluster - need to zoom in more
                                 const currentZoom = mymap.getZoom();
                                 if (currentZoom < 18) {
-                                    mymap.setView([selectedShow.Latitude, selectedShow.Longitude], currentZoom + 1);
+                                    mymap.flyTo([selectedShow.Latitude, selectedShow.Longitude], currentZoom + 1, {
+                                        duration: 0.5,
+                                        easeLinearity: 0.25
+                                    });
                                     // Try again after zoom
                                     setTimeout(() => {
                                         try {
@@ -930,7 +965,7 @@ async function findRandomStory() {
                                         } catch (e) {
                                             console.log("Could not open popup after zoom");
                                         }
-                                    }, 400);
+                                    }, 600);
                                 } else {
                                     // Already at high zoom, try to open directly
                                     try {
@@ -1014,22 +1049,25 @@ async function findRandomStory() {
                     ) {
                         try {
                             // Force the map to zoom to the exact location
-                            mymap.setView([selectedShow.Latitude, selectedShow.Longitude], 18);
+                            mymap.flyTo([selectedShow.Latitude, selectedShow.Longitude], 18, {
+                                duration: 0.5,
+                                easeLinearity: 0.25
+                            });
                             setTimeout(() => {
                                 try {
                                     marker.openPopup();
                                 } catch (e) {
                                     console.log("Final attempt failed:", e);
                                 }
-                            }, 300);
+                            }, 600);
                         } catch (e) {
                             console.log("Final attempt failed:", e);
                         }
                     }
                 });
             }
-        }, 800);
-    }, 500);
+        }, 1000);
+    }, 1200);
 }
 
 // ========== FILTERING FUNCTIONS ========== //
