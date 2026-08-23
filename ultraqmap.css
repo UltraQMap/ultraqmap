@@ -231,6 +231,7 @@ input[type="checkbox"]:checked::after {
 }
 /* ========== END CUSTOM CHECKBOX STYLES ========== */
 
+/* Reset View*/
 .custom-button {
     background-color: white;
     border: solid rgba(0, 0, 0, 0.2) 2px;
