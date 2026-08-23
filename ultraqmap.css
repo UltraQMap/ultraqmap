@@ -232,24 +232,26 @@ input[type="checkbox"]:checked::after {
 /* ========== END CUSTOM CHECKBOX STYLES ========== */
 
 .custom-button {
-    background-color: rgba(255, 255, 255);
-    background-image: url("Images/globe_icon.png");
-    background-size: 72%;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-clip: padding-box;
+    background-color: white;
     border: solid rgba(0, 0, 0, 0.2) 2px;
     border-radius: 4px;
     width: 33px;
     height: 33px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-size: 76%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("Images/globe_icon_teal.png");
 }
-
 .custom-button:hover {
-    background-color: rgb(245, 245, 245);
+    background-color: rgb(11, 59, 56);
     transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-image: url("Images/globe_icon_white.png");
 }
 
 #splash-modal {
@@ -720,19 +722,16 @@ input[type="checkbox"]:checked::after {
 
 /* Layer Control Panel */
 .layer-control-container {
-    top: -152px;
+    top: -190px;
     left: 36px;
     width: 145px;
     background-color: white;
     border: solid rgba(0, 0, 0, 0.2) 2px;
     border-radius: 4px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 6px;
     display: flex;
     flex-direction: column;
-    gap: 5px;
 }
-
 .layer-toggle-btn {
     padding: 5px 10px;
     font-family: "Changa", sans-serif;
@@ -747,16 +746,14 @@ input[type="checkbox"]:checked::after {
     transition: all 0.2s;
     white-space: nowrap;
 }
-
 .layer-toggle-btn:hover {
     transform: scale(1.02);
     opacity: 0.95;
 }
 
 /* ========== MAP CONTROL BUTTONS ========== */
-/* Base button style for all story finder style buttons */
 .story-finder-btn {
-    top: -160px;
+    top: -198px;
     left: 36px;
     background-color: rgb(208, 113, 38);
     color: white;
@@ -773,9 +770,8 @@ input[type="checkbox"]:checked::after {
     white-space: nowrap;
     display: flex;
     align-items: center;
-    margin-bottom: 1px;
+    margin-bottom: 2px;
 }
-
 .story-finder-btn:hover {
     background-color: rgb(218, 126, 53);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -785,7 +781,7 @@ input[type="checkbox"]:checked::after {
 .custom-control-container {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
     top: -6px;
 }
 
@@ -798,7 +794,7 @@ input[type="checkbox"]:checked::after {
     height: 33px;
     cursor: pointer;
     font-family: "Changa", sans-serif;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     color: rgb(11, 59, 56);
     display: flex;
@@ -807,26 +803,77 @@ input[type="checkbox"]:checked::after {
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 .custom-help-button:hover {
     background-color: rgb(11, 59, 56);
     color: white;
     transform: scale(1.05);
 }
 
+/* QR Code button */
+.custom-qr-button {
+    background-color: white;
+    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border-radius: 4px;
+    width: 33px;
+    height: 33px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-size: 85%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("Images/UQ_WebMap_QR_teal.png");
+}
+.custom-qr-button:hover {
+    background-color: rgb(11, 59, 56);
+    transform: scale(1.05);
+    background-image: url("Images/UQ_WebMap_QR_white.png");
+}
+/* business card modal */
+#business-card-modal {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+#business-card-modal .modal-content {
+    max-width: 600px;
+    text-align: center;
+}
+#business-card-modal .modal-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.close-business-card {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #666;
+    transition: color 0.2s;
+    z-index: 1;
+}
+.close-business-card:hover {
+    color: #000;
+}
+
+
 /* ========== SUBMIT BUTTON ========== */
 .submit-btn {
     background-color: rgb(208, 113, 38);
     color: white;
     margin-top: 0 !important;
-    margin-bottom: 1px !important;
+    margin-bottom: 2px !important;
     padding: 4px 10px;
     width: 145px;
 }
-
 .submit-btn:hover {
     background-color: rgb(218, 126, 53) !important;
 }
+
 
 /* ========== ANNIVERSARY BUTTON ========== */
 .anniversary-btn {
@@ -1068,10 +1115,6 @@ input[type="checkbox"]:checked::after {
         gap: 6px;
         flex-wrap: wrap;
         justify-content: center;
-    }
-
-    .header-logo {
-        height: 25px;
     }
 
     h1 {

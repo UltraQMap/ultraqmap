@@ -30,6 +30,16 @@ var ZoomOutControl = L.Control.extend({
             e.stopPropagation();
             showHelpPopup();
         };
+        
+        // QR button
+        var qrButton = L.DomUtil.create("button", "custom-qr-button", container);
+        qrButton.title = "Share this map";
+        qrButton.onclick = function (e) {
+            e.stopPropagation();
+            // Open business card modal
+            var modal = document.getElementById("business-card-modal");
+            if (modal) modal.style.display = "block";
+        };
 
         return container;
     }
@@ -1447,4 +1457,20 @@ document.addEventListener("DOMContentLoaded", function () {
             displayCurrentStory();
         }
     });
+
+    // Business Card Modal listeners
+    const businessModal = document.getElementById("business-card-modal");
+    const businessClose = document.querySelector(".close-business-card");
+    
+    if (businessClose) {
+        businessClose.addEventListener("click", function() {
+            if (businessModal) businessModal.style.display = "none";
+        });
+    }
+    if (businessModal) {
+        businessModal.addEventListener("click", function(e) {
+            if (e.target === businessModal) businessModal.style.display = "none";
+        });
+    }
+
 });
