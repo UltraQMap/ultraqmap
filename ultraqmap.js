@@ -162,7 +162,7 @@ function showTemporaryNotification(message) {
 }
 
 // Create locator (inset) map
-var miniMap = new L.Control.MiniMap(L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"), {
+var miniMap = new L.Control.MiniMap(L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_4id1_1_67fa8cb29c0242f5e904c9ec"), {
     toggleDisplay: true,
     position: "bottomright",
     zoomLevelOffset: -6
