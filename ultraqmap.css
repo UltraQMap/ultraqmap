@@ -1303,7 +1303,7 @@ input[type="checkbox"]:checked::after {
 }
 
 /* ============================================================
-   MOBILE (≤ 600px) — all rules consolidated here
+   MOBILE (≤ 600px)
    ============================================================ */
 @media (max-width: 600px) {
     /* Body layout */
@@ -1344,11 +1344,15 @@ input[type="checkbox"]:checked::after {
     #year-control {
         top: 68px;
         right: 5px;
-        max-width: 150px;
+        max-width: 168px;
         padding: 8px;
+    }
+    .year-control-header {
         font-size: 14px;
     }
-
+    .year-control-body {
+        font-size: 13px;
+    }
     .year-control-toggle {
         width: 18px;
         height: 18px;
