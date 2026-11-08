@@ -1,4 +1,19 @@
 /* ============================================================
+   THEME TOKENS
+   ============================================================ */
+:root {
+    --uq-teal: rgb(11, 59, 56);
+    --uq-teal-light: rgb(17, 92, 87);
+    --uq-orange: rgb(208, 113, 38);
+    --uq-orange-hover: rgb(218, 126, 53);
+    --uq-orange-light: #e29b64;
+    --uq-border: rgba(0, 0, 0, 0.2);
+    --uq-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    --uq-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --uq-font: "Changa", sans-serif;
+}
+
+/* ============================================================
    BASE / RESET
    ============================================================ */
 html,
@@ -6,7 +21,7 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background-color: rgb(11, 59, 56);
+    background-color: var(--uq-teal);
 }
 
 * {
@@ -21,14 +36,14 @@ body {
     min-height: 100vh;
     width: 100vw;
     overflow: hidden;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
 }
 
 /* ============================================================
    HEADER / FOOTER
    ============================================================ */
 header {
-    background-color: rgb(11, 59, 56);
+    background-color: var(--uq-teal);
     color: white;
     padding: 10px;
     flex-shrink: 0;
@@ -54,7 +69,7 @@ h1 {
 }
 
 footer {
-    background-color: rgb(11, 59, 56);
+    background-color: var(--uq-teal);
     color: white;
     padding: 4px;
     text-align: center;
@@ -69,7 +84,7 @@ footer {
 
 footer a,
 header a {
-    color: rgb(208, 113, 38);
+    color: var(--uq-orange);
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -78,7 +93,7 @@ header a {
 
 footer a:hover,
 header a:hover {
-    color: #e29b64;
+    color: var(--uq-orange-light);
 }
 
 /* ============================================================
@@ -99,11 +114,11 @@ header a:hover {
 .leaflet-control-scale {
     bottom: -5px;
     left: 5px;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
 }
 
 .leaflet-popup-content {
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     font-size: 14px;
     color: #333;
     margin: 8px 12px;
@@ -119,7 +134,7 @@ header a:hover {
 }
 
 /* ============================================================
-   YEAR FILTER CONTROL (top right)
+   YEAR FILTER CONTROL (top right) — collapsible
    ============================================================ */
 #year-control {
     position: absolute;
@@ -130,10 +145,68 @@ header a:hover {
     padding: 10px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    font-family: "Changa", sans-serif;
-    max-height: 70vh;
+    font-family: var(--uq-font);
+    max-width: 190px;
+    overflow: hidden;
+}
+
+.year-control-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 15px;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    padding-bottom: 6px;
+}
+
+#year-control.collapsed .year-control-header {
+    padding-bottom: 0;
+}
+
+.year-control-toggle {
+    background: none;
+    border: none;
+    font-family: var(--uq-font);
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--uq-teal);
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: background-color 0.2s;
+}
+
+.year-control-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.year-control-body {
+    max-height: 60vh;
     overflow-y: auto;
-    max-width: 200px;
+    font-size: 14px;
+    transition:
+        max-height 0.25s ease,
+        opacity 0.2s ease;
+    opacity: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#year-control.collapsed .year-control-body {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
 }
 
 #year-control label {
@@ -151,14 +224,30 @@ header a:hover {
     border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.year-2019 { background-color: #23bdb4; }
-.year-2020 { background-color: #23bd66; }
-.year-2021 { background-color: #bdb423; }
-.year-2022 { background-color: #bd237a; }
-.year-2023 { background-color: #bd232d; }
-.year-2024 { background-color: #bd6623; }
-.year-2025 { background-color: #237abd; }
-.year-2026 { background-color: #6623bd; }
+.year-2019 {
+    background-color: #23bdb4;
+}
+.year-2020 {
+    background-color: #23bd66;
+}
+.year-2021 {
+    background-color: #bdb423;
+}
+.year-2022 {
+    background-color: #bd237a;
+}
+.year-2023 {
+    background-color: #bd232d;
+}
+.year-2024 {
+    background-color: #bd6623;
+}
+.year-2025 {
+    background-color: #237abd;
+}
+.year-2026 {
+    background-color: #6623bd;
+}
 
 #year-control input:checked + .year-color {
     transform: scale(1.3);
@@ -172,17 +261,13 @@ header a:hover {
 
 /* ============================================================
    CHOROPLETH LEGEND
-   NOTE: Do NOT set top/left on .choropleth-legend. Position
-   is controlled entirely by the wrapper (.choropleth-legend-stack)
-   whose top is set via JS inline style (topOffsetPx /
-   mobileTopOffsetPx in ultraqmap.js).
    ============================================================ */
 .choropleth-legend {
     background: white;
-    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border: solid var(--uq-border) 2px;
     border-radius: 4px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    font-family: "Changa", sans-serif;
+    box-shadow: var(--uq-shadow);
+    font-family: var(--uq-font);
     font-size: 12px;
     width: 145px;
     overflow: hidden;
@@ -195,13 +280,13 @@ header a:hover {
     padding: 4px 8px;
     cursor: pointer;
     user-select: none;
-    background: rgb(11, 59, 56);
+    background: var(--uq-teal);
     color: white;
     font-weight: bold;
 }
 
 .choropleth-legend .legend-header:hover {
-    background: rgb(17, 92, 87);
+    background: var(--uq-teal-light);
 }
 
 .choropleth-legend .legend-toggle-icon {
@@ -216,7 +301,10 @@ header a:hover {
 
 .choropleth-legend .legend-body {
     padding: 6px 8px;
-    transition: max-height 0.25s ease, padding 0.25s ease, opacity 0.2s ease;
+    transition:
+        max-height 0.25s ease,
+        padding 0.25s ease,
+        opacity 0.2s ease;
     max-height: 400px;
     opacity: 1;
 }
@@ -238,7 +326,7 @@ header a:hover {
     border-bottom: 1px solid #eee;
     cursor: pointer;
     font-weight: bold;
-    color: rgb(11, 59, 56);
+    color: var(--uq-teal);
 }
 
 .choropleth-legend .legend-enable-row input[type="checkbox"] {
@@ -273,12 +361,12 @@ header a:hover {
 .choropleth-legend .legend-layer-btn {
     flex: 1;
     padding: 3px 4px;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     font-size: 11px;
     font-weight: bold;
-    border: 2px solid rgb(11, 59, 56);
+    border: 2px solid var(--uq-teal);
     background: #f0f0f0;
-    color: rgb(11, 59, 56);
+    color: var(--uq-teal);
     border-radius: 3px;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -291,8 +379,8 @@ header a:hover {
 }
 
 .choropleth-legend .legend-layer-btn.active {
-    background: rgb(208, 113, 38);
-    border-color: rgb(208, 113, 38);
+    background: var(--uq-orange);
+    border-color: var(--uq-orange);
     color: white;
 }
 
@@ -308,7 +396,7 @@ input[type="checkbox"] {
     -webkit-appearance: none;
     width: 16px;
     height: 16px;
-    border: 2px solid rgb(11, 59, 56);
+    border: 2px solid var(--uq-teal);
     border-radius: 3px;
     cursor: pointer;
     position: relative;
@@ -322,8 +410,8 @@ input[type="checkbox"]:hover {
 }
 
 input[type="checkbox"]:checked {
-    background-color: rgb(208, 113, 38);
-    border-color: rgb(208, 113, 38);
+    background-color: var(--uq-orange);
+    border-color: var(--uq-orange);
 }
 
 input[type="checkbox"]:checked::after {
@@ -346,7 +434,7 @@ input[type="checkbox"]:checked::after {
     border: none;
     border-radius: 0;
     background-color: transparent;
-    accent-color: rgb(11, 59, 56);
+    accent-color: var(--uq-teal);
 }
 
 #year-control input[type="checkbox"]:hover {
@@ -367,7 +455,7 @@ input[type="checkbox"]:checked::after {
    ============================================================ */
 .custom-button {
     background-color: white;
-    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border: solid var(--uq-border) 2px;
     border-radius: 4px;
     width: 33px;
     height: 33px;
@@ -375,8 +463,10 @@ input[type="checkbox"]:checked::after {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.15s ease, transform 0.15s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition:
+        background-color 0.15s ease,
+        transform 0.15s ease;
+    box-shadow: var(--uq-shadow-sm);
     background-size: 76%;
     background-repeat: no-repeat;
     background-position: center;
@@ -386,7 +476,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .custom-button:hover {
-    background-color: rgb(11, 59, 56);
+    background-color: var(--uq-teal);
     transform: scale(1.05);
     background-image: url("Images/globe_icon_white.png");
 }
@@ -405,31 +495,31 @@ input[type="checkbox"]:checked::after {
 
 .custom-help-button {
     background-color: white;
-    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border: solid var(--uq-border) 2px;
     border-radius: 4px;
     width: 33px;
     height: 33px;
     cursor: pointer;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     font-size: 22px;
     font-weight: bold;
-    color: rgb(11, 59, 56);
+    color: var(--uq-teal);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--uq-shadow-sm);
 }
 
 .custom-help-button:hover {
-    background-color: rgb(11, 59, 56);
+    background-color: var(--uq-teal);
     color: white;
     transform: scale(1.05);
 }
 
 .custom-qr-button {
     background-color: white;
-    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border: solid var(--uq-border) 2px;
     border-radius: 4px;
     width: 33px;
     height: 33px;
@@ -438,7 +528,7 @@ input[type="checkbox"]:checked::after {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--uq-shadow-sm);
     background-size: 85%;
     background-repeat: no-repeat;
     background-position: center;
@@ -446,7 +536,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .custom-qr-button:hover {
-    background-color: rgb(11, 59, 56);
+    background-color: var(--uq-teal);
     transform: scale(1.05);
     background-image: url("Images/UQ_WebMap_QR_white.png");
 }
@@ -459,16 +549,16 @@ input[type="checkbox"]:checked::after {
     left: 36px;
     width: 145px;
     background-color: white;
-    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border: solid var(--uq-border) 2px;
     border-radius: 4px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--uq-shadow);
     display: flex;
     flex-direction: column;
 }
 
 .layer-toggle-btn {
     padding: 5px 10px;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     font-size: 12px;
     font-weight: bold;
     border: none;
@@ -493,14 +583,14 @@ input[type="checkbox"]:checked::after {
 .story-finder-btn {
     top: -198px;
     left: 36px;
-    background-color: rgb(208, 113, 38);
+    background-color: var(--uq-orange);
     color: white;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     font-weight: bold;
     font-size: 12px;
     padding: 4px 10px;
     width: 145px;
-    border: 2px solid rgba(0, 0, 0, 0.2);
+    border: 2px solid var(--uq-border);
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -512,12 +602,12 @@ input[type="checkbox"]:checked::after {
 }
 
 .story-finder-btn:hover {
-    background-color: rgb(218, 126, 53);
+    background-color: var(--uq-orange-hover);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .submit-btn {
-    background-color: rgb(208, 113, 38);
+    background-color: var(--uq-orange);
     color: white;
     margin-top: 0 !important;
     margin-bottom: 2px !important;
@@ -526,11 +616,11 @@ input[type="checkbox"]:checked::after {
 }
 
 .submit-btn:hover {
-    background-color: rgb(218, 126, 53) !important;
+    background-color: var(--uq-orange-hover) !important;
 }
 
 .anniversary-btn {
-    background-color: rgb(208, 113, 38) !important;
+    background-color: var(--uq-orange) !important;
     color: white !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
@@ -539,7 +629,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .anniversary-btn:hover {
-    background-color: rgb(218, 126, 53) !important;
+    background-color: var(--uq-orange-hover) !important;
 }
 
 /* ============================================================
@@ -552,8 +642,8 @@ input[type="checkbox"]:checked::after {
     z-index: 1000;
     background-color: white;
     border-radius: 4px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    font-family: "Changa", sans-serif;
+    box-shadow: var(--uq-shadow);
+    font-family: var(--uq-font);
     max-width: 260px;
     min-width: 210px;
     transition: all 0.3s ease;
@@ -578,7 +668,7 @@ input[type="checkbox"]:checked::after {
     cursor: pointer;
     user-select: none;
     background-color: white;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     font-size: 12px;
     font-weight: bold;
     transition: background-color 0.2s;
@@ -590,7 +680,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .stats-header strong {
-    color: rgb(11, 59, 56);
+    color: var(--uq-teal);
     font-size: 12px;
     font-weight: bold;
 }
@@ -601,7 +691,7 @@ input[type="checkbox"]:checked::after {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    color: rgb(11, 59, 56);
+    color: var(--uq-teal);
     width: 24px;
     height: 24px;
     display: flex;
@@ -609,7 +699,7 @@ input[type="checkbox"]:checked::after {
     justify-content: center;
     border-radius: 3px;
     transition: all 0.2s;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
 }
 
 .stats-toggle:hover {
@@ -642,7 +732,7 @@ input[type="checkbox"]:checked::after {
 
 .city-rank .rank-number {
     font-weight: bold;
-    color: rgb(208, 113, 38);
+    color: var(--uq-orange);
     min-width: 25px;
     font-size: 11px;
 }
@@ -658,7 +748,7 @@ input[type="checkbox"]:checked::after {
 
 .city-rank .show-count {
     font-weight: bold;
-    background-color: rgb(11, 59, 56);
+    background-color: var(--uq-teal);
     color: white;
     padding: 2px 6px;
     border-radius: 12px;
@@ -717,8 +807,8 @@ input[type="checkbox"]:checked::after {
 
 .nav-button {
     background-color: transparent;
-    color: rgb(11, 59, 56);
-    border: 2px solid rgb(11, 59, 56);
+    color: var(--uq-teal);
+    border: 2px solid var(--uq-teal);
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -732,7 +822,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .nav-button:hover {
-    background-color: rgb(11, 59, 56);
+    background-color: var(--uq-teal);
     color: white;
     transform: scale(1.1);
 }
@@ -743,8 +833,8 @@ input[type="checkbox"]:checked::after {
 }
 
 .primary-button {
-    font-family: "Changa", sans-serif;
-    background-color: rgb(11, 59, 56);
+    font-family: var(--uq-font);
+    background-color: var(--uq-teal);
     color: white;
     border: none;
     padding: 0.4rem 1rem;
@@ -761,7 +851,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .primary-button:hover {
-    background-color: rgb(17, 92, 87);
+    background-color: var(--uq-teal-light);
     transform: scale(1.05);
 }
 
@@ -781,13 +871,19 @@ input[type="checkbox"]:checked::after {
 }
 
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .splash-content h1 {
-    color: rgb(11, 59, 56);
-    font-family: "Changa", sans-serif;
+    color: var(--uq-teal);
+    font-family: var(--uq-font);
     font-size: 2rem;
     margin-bottom: 1rem;
 }
@@ -796,13 +892,13 @@ input[type="checkbox"]:checked::after {
     text-align: center;
     margin: 1rem 0;
     line-height: 1.6;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     font-size: 1rem;
     padding: 0 10px;
 }
 
 .splash-text a {
-    color: rgb(208, 113, 38);
+    color: var(--uq-orange);
     text-decoration: none;
 }
 
@@ -839,9 +935,9 @@ input[type="checkbox"]:checked::after {
    PHOTO / STORY MODALS + POPUP BUTTONS
    ============================================================ */
 .gallery-button {
-    background-color: rgb(11, 59, 56);
+    background-color: var(--uq-teal);
     color: white;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     border: none;
     padding: 2px 10px;
     border-radius: 3px;
@@ -851,13 +947,13 @@ input[type="checkbox"]:checked::after {
 }
 
 .gallery-button:hover {
-    background-color: rgb(17, 92, 87);
+    background-color: var(--uq-teal-light);
 }
 
 .stories-button {
-    background-color: rgb(208, 113, 38);
+    background-color: var(--uq-orange);
     color: white;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     border: none;
     padding: 2px 10px;
     border-radius: 3px;
@@ -938,8 +1034,8 @@ input[type="checkbox"]:checked::after {
 
 .gallery-nav button {
     padding: 8px 16px;
-    font-family: "Changa", sans-serif;
-    background-color: rgb(11, 59, 56);
+    font-family: var(--uq-font);
+    background-color: var(--uq-teal);
     color: white;
     border: none;
     border-radius: 4px;
@@ -947,7 +1043,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .gallery-nav button:hover {
-    background-color: rgb(17, 92, 87);
+    background-color: var(--uq-teal-light);
 }
 
 .gallery-nav button:disabled {
@@ -962,7 +1058,7 @@ input[type="checkbox"]:checked::after {
 
 .photo-container {
     text-align: center;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
     margin: 0;
 }
 
@@ -994,7 +1090,7 @@ input[type="checkbox"]:checked::after {
 }
 
 .story-container h4 {
-    color: rgb(11, 59, 56);
+    color: var(--uq-teal);
     margin-bottom: 10px;
     font-size: 1.2rem;
 }
@@ -1003,7 +1099,7 @@ input[type="checkbox"]:checked::after {
     background-color: #f9f9f9;
     padding: 15px;
     border-radius: 5px;
-    border-left: 4px solid rgb(208, 113, 38);
+    border-left: 4px solid var(--uq-orange);
     margin-bottom: 15px;
     white-space: pre-line;
     max-height: 400px;
@@ -1106,7 +1202,7 @@ input[type="checkbox"]:checked::after {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     position: relative;
     animation: helpFadeInUp 0.3s ease-out;
-    font-family: "Changa", sans-serif;
+    font-family: var(--uq-font);
 }
 
 #help-popup .help-close-btn {
@@ -1128,8 +1224,8 @@ input[type="checkbox"]:checked::after {
 }
 
 #help-popup .help-title {
-    color: rgb(11, 59, 56);
-    font-family: "Changa", sans-serif;
+    color: var(--uq-teal);
+    font-family: var(--uq-font);
     font-size: 1.8rem;
     margin-bottom: 15px;
     margin-top: 0;
@@ -1145,7 +1241,7 @@ input[type="checkbox"]:checked::after {
 #help-popup .help-text a,
 #help-popup .help-divider a,
 #help-popup .help-footer a {
-    color: rgb(208, 113, 38);
+    color: var(--uq-orange);
     text-decoration: none;
     transition: color 0.2s ease;
 }
@@ -1153,7 +1249,7 @@ input[type="checkbox"]:checked::after {
 #help-popup .help-text a:hover,
 #help-popup .help-divider a:hover,
 #help-popup .help-footer a:hover {
-    color: #e29b64;
+    color: var(--uq-orange-light);
     text-decoration: underline;
 }
 
@@ -1167,8 +1263,8 @@ input[type="checkbox"]:checked::after {
 }
 
 #help-popup .help-got-it-btn {
-    font-family: "Changa", sans-serif;
-    background-color: rgb(11, 59, 56);
+    font-family: var(--uq-font);
+    background-color: var(--uq-teal);
     color: white;
     border: none;
     padding: 8px 30px;
@@ -1182,18 +1278,28 @@ input[type="checkbox"]:checked::after {
 }
 
 #help-popup .help-got-it-btn:hover {
-    background-color: rgb(17, 92, 87);
+    background-color: var(--uq-teal-light);
     transform: scale(1.02);
 }
 
 @keyframes helpFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes helpFadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ============================================================
@@ -1231,7 +1337,7 @@ input[type="checkbox"]:checked::after {
     .leaflet-control-scale {
         bottom: -5px;
         left: 0;
-        font-family: "Changa", sans-serif;
+        font-family: var(--uq-font);
     }
 
     /* Year filter */
@@ -1241,6 +1347,16 @@ input[type="checkbox"]:checked::after {
         max-width: 150px;
         padding: 8px;
         font-size: 14px;
+    }
+
+    .year-control-toggle {
+        width: 18px;
+        height: 18px;
+        font-size: 14px;
+    }
+
+    .year-control-body {
+        max-height: 50vh;
     }
 
     /* Stats panel */

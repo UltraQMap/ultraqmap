@@ -1214,8 +1214,51 @@ function loadShowsData() {
 
 function createYearControl() {
     const container = document.getElementById("year-control");
-    container.innerHTML = '<strong style="color: rgb(11, 59, 56);">Year & Show Count</strong>';
+    container.innerHTML = "";
 
+    // --- Header (clickable) ---
+    const header = document.createElement("div");
+    header.className = "year-control-header";
+
+    const title = document.createElement("strong");
+    title.textContent = "Year & Show Count";
+    title.style.color = "rgb(11, 59, 56)";
+
+    const toggle = document.createElement("button");
+    toggle.className = "year-control-toggle";
+    toggle.type = "button";
+    toggle.textContent = "+";
+    toggle.title = "Show/hide year filters";
+
+    header.appendChild(title);
+    header.appendChild(toggle);
+    container.appendChild(header);
+
+    // --- Body (year checkboxes) ---
+    const body = document.createElement("div");
+    body.className = "year-control-body";
+    container.appendChild(body);
+
+    // Start collapsed? Change to false if you want it open by default.
+    let collapsed = false;
+    container.classList.toggle("collapsed", collapsed);
+    toggle.textContent = collapsed ? "+" : "−";
+
+    const togglePanel = () => {
+        collapsed = !collapsed;
+        container.classList.toggle("collapsed", collapsed);
+        toggle.textContent = collapsed ? "+" : "−";
+    };
+
+    toggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        togglePanel();
+    });
+    header.addEventListener("click", (e) => {
+        if (e.target !== toggle) togglePanel();
+    });
+
+    // --- Populate year labels ---
     Object.keys(markersByYear)
         .sort()
         .forEach((year) => {
@@ -1240,7 +1283,7 @@ function createYearControl() {
                 label.appendChild(checkbox);
                 label.appendChild(colorIndicator);
                 label.appendChild(text);
-                container.appendChild(label);
+                body.appendChild(label);
             }
         });
 }
