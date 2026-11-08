@@ -1,3 +1,6 @@
+/* ============================================================
+   BASE / RESET
+   ============================================================ */
 html,
 body {
     height: 100%;
@@ -21,6 +24,9 @@ body {
     font-family: "Changa", sans-serif;
 }
 
+/* ============================================================
+   HEADER / FOOTER
+   ============================================================ */
 header {
     background-color: rgb(11, 59, 56);
     color: white;
@@ -45,24 +51,6 @@ h1 {
     font-size: 2.2rem;
     line-height: 1;
     padding: 5px;
-}
-
-#map-container {
-    flex-grow: 1;
-    position: relative;
-    min-height: 0;
-    overflow: hidden;
-}
-
-#map {
-    height: 100%;
-    width: 100%;
-}
-
-.leaflet-control-scale {
-    bottom: -5px;
-    left: 5px;
-    font-family: "Changa", sans-serif;
 }
 
 footer {
@@ -93,6 +81,27 @@ header a:hover {
     color: #e29b64;
 }
 
+/* ============================================================
+   MAP CONTAINER
+   ============================================================ */
+#map-container {
+    flex-grow: 1;
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.leaflet-control-scale {
+    bottom: -5px;
+    left: 5px;
+    font-family: "Changa", sans-serif;
+}
+
 .leaflet-popup-content {
     font-family: "Changa", sans-serif;
     font-size: 14px;
@@ -105,6 +114,13 @@ header a:hover {
     color: #000;
 }
 
+.leaflet-bottom {
+    padding-bottom: 10px;
+}
+
+/* ============================================================
+   YEAR FILTER CONTROL (top right)
+   ============================================================ */
 #year-control {
     position: absolute;
     top: 76px;
@@ -135,30 +151,14 @@ header a:hover {
     border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-.year-2019 {
-    background-color: #23bdb4;
-}
-.year-2020 {
-    background-color: #23bd66;
-}
-.year-2021 {
-    background-color: #bdb423;
-}
-.year-2022 {
-    background-color: #bd237a;
-}
-.year-2023 {
-    background-color: #bd232d;
-}
-.year-2024 {
-    background-color: #bd6623;
-}
-.year-2025 {
-    background-color: #237abd;
-}
-.year-2026 {
-    background-color: #6623bd;
-}
+.year-2019 { background-color: #23bdb4; }
+.year-2020 { background-color: #23bd66; }
+.year-2021 { background-color: #bdb423; }
+.year-2022 { background-color: #bd237a; }
+.year-2023 { background-color: #bd232d; }
+.year-2024 { background-color: #bd6623; }
+.year-2025 { background-color: #237abd; }
+.year-2026 { background-color: #6623bd; }
 
 #year-control input:checked + .year-color {
     transform: scale(1.3);
@@ -170,13 +170,144 @@ header a:hover {
     cursor: pointer;
 }
 
-/* ========== CUSTOM CHECKBOX STYLES ========== */
+/* ============================================================
+   CHOROPLETH LEGEND
+   NOTE: Do NOT set top/left on .choropleth-legend. Position
+   is controlled entirely by the wrapper (.choropleth-legend-stack)
+   whose top is set via JS inline style (topOffsetPx /
+   mobileTopOffsetPx in ultraqmap.js).
+   ============================================================ */
+.choropleth-legend {
+    background: white;
+    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    font-family: "Changa", sans-serif;
+    font-size: 12px;
+    width: 145px;
+    overflow: hidden;
+}
+
+.choropleth-legend .legend-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 8px;
+    cursor: pointer;
+    user-select: none;
+    background: rgb(11, 59, 56);
+    color: white;
+    font-weight: bold;
+}
+
+.choropleth-legend .legend-header:hover {
+    background: rgb(17, 92, 87);
+}
+
+.choropleth-legend .legend-toggle-icon {
+    font-size: 14px;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.choropleth-legend.collapsed .legend-toggle-icon {
+    transform: rotate(-90deg);
+}
+
+.choropleth-legend .legend-body {
+    padding: 6px 8px;
+    transition: max-height 0.25s ease, padding 0.25s ease, opacity 0.2s ease;
+    max-height: 400px;
+    opacity: 1;
+}
+
+.choropleth-legend.collapsed .legend-body {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.choropleth-legend .legend-enable-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-weight: bold;
+    color: rgb(11, 59, 56);
+}
+
+.choropleth-legend .legend-enable-row input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.choropleth-legend .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 0;
+    color: #333;
+}
+
+.choropleth-legend .legend-swatch {
+    width: 16px;
+    height: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.choropleth-legend .legend-layer-selector {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 6px;
+}
+
+.choropleth-legend .legend-layer-btn {
+    flex: 1;
+    padding: 3px 4px;
+    font-family: "Changa", sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    border: 2px solid rgb(11, 59, 56);
+    background: #f0f0f0;
+    color: rgb(11, 59, 56);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    line-height: 1.1;
+}
+
+.choropleth-legend .legend-layer-btn:hover {
+    background: #e2e2e2;
+    transform: scale(1.03);
+}
+
+.choropleth-legend .legend-layer-btn.active {
+    background: rgb(208, 113, 38);
+    border-color: rgb(208, 113, 38);
+    color: white;
+}
+
+.choropleth-legend .legend-swatches:empty {
+    display: none;
+}
+
+/* ============================================================
+   CUSTOM CHECKBOXES
+   ============================================================ */
 input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
     width: 16px;
     height: 16px;
-    border: 2px solid rgb(11, 59, 56);
     border: 2px solid rgb(11, 59, 56);
     border-radius: 3px;
     cursor: pointer;
@@ -206,7 +337,7 @@ input[type="checkbox"]:checked::after {
     font-weight: bold;
 }
 
-/* Specific styling for year filter checkboxes */
+/* Year filter uses native checkboxes instead of custom */
 #year-control input[type="checkbox"] {
     width: auto;
     height: auto;
@@ -230,9 +361,10 @@ input[type="checkbox"]:checked::after {
 #year-control input[type="checkbox"]:checked::after {
     content: none;
 }
-/* ========== END CUSTOM CHECKBOX STYLES ========== */
 
-/* Reset View*/
+/* ============================================================
+   RESET VIEW / HELP / QR BUTTONS
+   ============================================================ */
 .custom-button {
     background-color: white;
     border: solid rgba(0, 0, 0, 0.2) 2px;
@@ -252,360 +384,167 @@ input[type="checkbox"]:checked::after {
     will-change: transform;
     backface-visibility: hidden;
 }
+
 .custom-button:hover {
     background-color: rgb(11, 59, 56);
     transform: scale(1.05);
     background-image: url("Images/globe_icon_white.png");
 }
+
 .custom-button:active {
     transform: scale(0.92);
     transition-duration: 0.05s;
 }
 
-#splash-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
+.custom-control-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    opacity: 1;
-    pointer-events: all;
-    padding: 20px;
-    box-sizing: border-box;
+    flex-direction: column;
+    gap: 2px;
+    top: -6px;
 }
 
-#splash-modal.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-.splash-page {
-    display: none;
-    width: 100%;
-}
-
-.splash-page.active {
-    display: block;
-}
-
-.splash-navigation {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    gap: 15px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.nav-button {
-    background-color: transparent;
-    color: rgb(11, 59, 56);
-    border: 2px solid rgb(11, 59, 56);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
+.custom-help-button {
+    background-color: white;
+    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border-radius: 4px;
+    width: 33px;
+    height: 33px;
     cursor: pointer;
-    transition: all 0.3s;
-    flex-shrink: 0;
-}
-
-.nav-button:hover {
-    background-color: rgb(11, 59, 56);
-    color: white;
-    transform: scale(1.1);
-}
-
-.nav-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.primary-button {
     font-family: "Changa", sans-serif;
-    background-color: rgb(11, 59, 56);
-    color: white;
-    border: none;
-    padding: 0.4rem 1rem;
-    font-size: 1.1rem;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s;
-    width: auto;
-    max-width: 100%;
-    margin: 0 auto;
-    margin-top: -20px;
-    margin-bottom: 5px;
-    display: block;
+    font-size: 22px;
+    font-weight: bold;
+    color: rgb(11, 59, 56);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.primary-button:hover {
-    background-color: rgb(17, 92, 87);
+.custom-help-button:hover {
+    background-color: rgb(11, 59, 56);
+    color: white;
     transform: scale(1.05);
 }
 
-.splash-content {
-    position: relative;
-    animation: fadeInUp 0.5s ease-out;
-    background-color: #fff;
-    padding: 1.5rem;
-    border-radius: 8px;
-    width: 100%;
-    max-width: 500px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    text-align: center;
-    margin: 0 auto;
-    padding-bottom: 80px;
-    box-sizing: border-box;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.splash-content h1 {
-    color: rgb(11, 59, 56);
-    font-family: "Changa", sans-serif;
-    font-size: 2rem;
-    margin-bottom: 1rem;
-}
-
-.splash-text {
-    text-align: center;
-    margin: 1rem 0;
-    line-height: 1.6;
-    font-family: "Changa", sans-serif;
-    font-size: 1rem;
-    padding: 0 10px;
-}
-
-.splash-text a {
-    color: rgb(208, 113, 38);
-    text-decoration: none;
-}
-
-.splash-text a:hover {
-    text-decoration: underline;
-}
-
-.close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 24px;
+.custom-qr-button {
+    background-color: white;
+    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border-radius: 4px;
+    width: 33px;
+    height: 33px;
     cursor: pointer;
-    color: #333;
-    padding: 5px;
-    line-height: 1;
-    z-index: 1;
-    width: 30px;
-    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-size: 85%;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url("Images/UQ_WebMap_QR_teal.png");
 }
 
-.close-button:hover {
-    color: #000;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 50%;
-}
-
-.gallery-button {
+.custom-qr-button:hover {
     background-color: rgb(11, 59, 56);
-    color: white;
+    transform: scale(1.05);
+    background-image: url("Images/UQ_WebMap_QR_white.png");
+}
+
+/* ============================================================
+   LAYER CONTROL PANEL (Donut Clusters / Heat Map)
+   ============================================================ */
+.layer-control-container {
+    top: -190px;
+    left: 36px;
+    width: 145px;
+    background-color: white;
+    border: solid rgba(0, 0, 0, 0.2) 2px;
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.layer-toggle-btn {
+    padding: 5px 10px;
     font-family: "Changa", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
     border: none;
-    padding: 2px 10px;
     border-radius: 3px;
     cursor: pointer;
-    font-size: 12px;
-    margin-top: 6px;
-}
-
-.gallery-button:hover {
-    background-color: rgb(17, 92, 87);
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-}
-
-.modal-content {
-    background-color: white;
-    margin: 3% auto;
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 800px;
-    max-height: 90%;
-    overflow-y: auto;
-    position: relative;
-}
-
-.close-gallery,
-.close-stories {
-    position: absolute;
-    right: 10px;
-    top: 5px;
-    width: 30px;
-    height: 30px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 28px;
-    cursor: pointer;
-    color: #333;
+    gap: 8px;
+    transition: all 0.2s;
+    white-space: nowrap;
 }
 
-.close-gallery:hover {
-    color: #000;
-    background-color: white;
-    border-radius: 50%;
+.layer-toggle-btn:hover {
+    transform: scale(1.02);
+    opacity: 0.95;
 }
 
-#gallery-images {
-    text-align: center;
-    margin: 0;
-}
-
-#gallery-images img {
-    max-width: 100%;
-    max-height: 500px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.gallery-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0;
-    padding: 10px;
-    padding-bottom: 0;
-}
-
-.gallery-nav button {
-    padding: 8px 16px;
-    font-family: "Changa", sans-serif;
-    background-color: rgb(11, 59, 56);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.gallery-nav button:hover {
-    background-color: rgb(17, 92, 87);
-}
-
-.gallery-nav button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-#photo-counter,
-#story-counter {
-    font-weight: bold;
-}
-
-.photo-container {
-    text-align: center;
-    font-family: "Changa", sans-serif;
-    margin: 0;
-}
-
-.photo-container img {
-    max-width: 100%;
-    max-height: 500px;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin-bottom: 0;
-}
-
-.photo-caption {
-    color: #666;
-    font-size: 14px;
-    padding: 0;
-    margin-top: 0;
-}
-
-.stories-button {
+/* ============================================================
+   ORANGE ACTION BUTTONS
+   (Find Photos/Stories, Submit Photos/Stories, Today in UQ History)
+   ============================================================ */
+.story-finder-btn {
+    top: -198px;
+    left: 36px;
     background-color: rgb(208, 113, 38);
     color: white;
     font-family: "Changa", sans-serif;
-    border: none;
-    padding: 2px 10px;
-    border-radius: 3px;
-    cursor: pointer;
+    font-weight: bold;
     font-size: 12px;
-    margin-top: 6px;
-    margin-left: 5px;
+    padding: 4px 10px;
+    width: 145px;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px;
 }
 
-.stories-button:hover {
-    background-color: rgb(226, 155, 100);
+.story-finder-btn:hover {
+    background-color: rgb(218, 126, 53);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-#stories-modal .modal-content {
-    background-color: white;
-    margin: 3% auto;
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 700px;
-    max-height: 90%;
-    overflow-y: auto;
-    position: relative;
+.submit-btn {
+    background-color: rgb(208, 113, 38);
+    color: white;
+    margin-top: 0 !important;
+    margin-bottom: 2px !important;
+    padding: 4px 10px;
+    width: 145px;
 }
 
-.story-container h4 {
-    color: rgb(11, 59, 56);
-    margin-bottom: 10px;
-    font-size: 1.2rem;
+.submit-btn:hover {
+    background-color: rgb(218, 126, 53) !important;
 }
 
-.story-content {
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 5px;
-    border-left: 4px solid rgb(208, 113, 38);
-    margin-bottom: 15px;
-    white-space: pre-line;
-    max-height: 400px;
-    overflow-y: auto;
+.anniversary-btn {
+    background-color: rgb(208, 113, 38) !important;
+    color: white !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding: 4px 10px;
+    width: 145px;
 }
 
-/* Updated Stats Panel to match layer controls */
+.anniversary-btn:hover {
+    background-color: rgb(218, 126, 53) !important;
+}
+
+/* ============================================================
+   STATS PANEL (Top 5 Cities)
+   ============================================================ */
 #stats-control {
     position: absolute;
     bottom: 83px;
@@ -728,132 +667,368 @@ input[type="checkbox"]:checked::after {
     text-align: center;
 }
 
-/* Layer Control Panel */
-.layer-control-container {
-    top: -190px;
-    left: 36px;
-    width: 145px;
-    background-color: white;
-    border: solid rgba(0, 0, 0, 0.2) 2px;
-    border-radius: 4px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+/* ============================================================
+   SPLASH MODAL
+   ============================================================ */
+#splash-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
     display: flex;
-    flex-direction: column;
-}
-.layer-toggle-btn {
-    padding: 5px 10px;
-    font-family: "Changa", sans-serif;
-    font-size: 12px;
-    font-weight: bold;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-.layer-toggle-btn:hover {
-    transform: scale(1.02);
-    opacity: 0.95;
+    z-index: 9999;
+    opacity: 1;
+    pointer-events: all;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-/* ========== MAP CONTROL BUTTONS ========== */
-.story-finder-btn {
-    top: -198px;
-    left: 36px;
+#splash-modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.splash-page {
+    display: none;
+    width: 100%;
+}
+
+.splash-page.active {
+    display: block;
+}
+
+.splash-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    gap: 15px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.nav-button {
+    background-color: transparent;
+    color: rgb(11, 59, 56);
+    border: 2px solid rgb(11, 59, 56);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex-shrink: 0;
+}
+
+.nav-button:hover {
+    background-color: rgb(11, 59, 56);
+    color: white;
+    transform: scale(1.1);
+}
+
+.nav-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.primary-button {
+    font-family: "Changa", sans-serif;
+    background-color: rgb(11, 59, 56);
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    font-size: 1.1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    margin-top: -20px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.primary-button:hover {
+    background-color: rgb(17, 92, 87);
+    transform: scale(1.05);
+}
+
+.splash-content {
+    position: relative;
+    animation: fadeInUp 0.5s ease-out;
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    margin: 0 auto;
+    padding-bottom: 80px;
+    box-sizing: border-box;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.splash-content h1 {
+    color: rgb(11, 59, 56);
+    font-family: "Changa", sans-serif;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.splash-text {
+    text-align: center;
+    margin: 1rem 0;
+    line-height: 1.6;
+    font-family: "Changa", sans-serif;
+    font-size: 1rem;
+    padding: 0 10px;
+}
+
+.splash-text a {
+    color: rgb(208, 113, 38);
+    text-decoration: none;
+}
+
+.splash-text a:hover {
+    text-decoration: underline;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+    padding: 5px;
+    line-height: 1;
+    z-index: 1;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button:hover {
+    color: #000;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+}
+
+/* ============================================================
+   PHOTO / STORY MODALS + POPUP BUTTONS
+   ============================================================ */
+.gallery-button {
+    background-color: rgb(11, 59, 56);
+    color: white;
+    font-family: "Changa", sans-serif;
+    border: none;
+    padding: 2px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+.gallery-button:hover {
+    background-color: rgb(17, 92, 87);
+}
+
+.stories-button {
     background-color: rgb(208, 113, 38);
     color: white;
     font-family: "Changa", sans-serif;
-    font-weight: bold;
+    border: none;
+    padding: 2px 10px;
+    border-radius: 3px;
+    cursor: pointer;
     font-size: 12px;
-    padding: 4px 10px;
-    width: 145px;
-    border: 2px solid rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    margin-bottom: 2px;
-}
-.story-finder-btn:hover {
-    background-color: rgb(218, 126, 53);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    margin-top: 6px;
+    margin-left: 5px;
 }
 
-/* Custom control container for stacked buttons (reset view/info) */
-.custom-control-container {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    top: -6px;
+.stories-button:hover {
+    background-color: rgb(226, 155, 100);
 }
 
-/* Help button styling */
-.custom-help-button {
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
     background-color: white;
-    border: solid rgba(0, 0, 0, 0.2) 2px;
-    border-radius: 4px;
-    width: 33px;
-    height: 33px;
-    cursor: pointer;
-    font-family: "Changa", sans-serif;
-    font-size: 22px;
-    font-weight: bold;
-    color: rgb(11, 59, 56);
+    margin: 3% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 800px;
+    max-height: 90%;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-gallery,
+.close-stories {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 28px;
+    cursor: pointer;
+    color: #333;
 }
-.custom-help-button:hover {
+
+.close-gallery:hover {
+    color: #000;
+    background-color: white;
+    border-radius: 50%;
+}
+
+#gallery-images {
+    text-align: center;
+    margin: 0;
+}
+
+#gallery-images img {
+    max-width: 100%;
+    max-height: 500px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0;
+    padding: 10px;
+    padding-bottom: 0;
+}
+
+.gallery-nav button {
+    padding: 8px 16px;
+    font-family: "Changa", sans-serif;
     background-color: rgb(11, 59, 56);
     color: white;
-    transform: scale(1.05);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
-/* QR Code button */
-.custom-qr-button {
+.gallery-nav button:hover {
+    background-color: rgb(17, 92, 87);
+}
+
+.gallery-nav button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#photo-counter,
+#story-counter {
+    font-weight: bold;
+}
+
+.photo-container {
+    text-align: center;
+    font-family: "Changa", sans-serif;
+    margin: 0;
+}
+
+.photo-container img {
+    max-width: 100%;
+    max-height: 500px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 0;
+}
+
+.photo-caption {
+    color: #666;
+    font-size: 14px;
+    padding: 0;
+    margin-top: 0;
+}
+
+#stories-modal .modal-content {
     background-color: white;
-    border: solid rgba(0, 0, 0, 0.2) 2px;
-    border-radius: 4px;
-    width: 33px;
-    height: 33px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    background-size: 85%;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-image: url("Images/UQ_WebMap_QR_teal.png");
+    margin: 3% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 700px;
+    max-height: 90%;
+    overflow-y: auto;
+    position: relative;
 }
-.custom-qr-button:hover {
-    background-color: rgb(11, 59, 56);
-    transform: scale(1.05);
-    background-image: url("Images/UQ_WebMap_QR_white.png");
+
+.story-container h4 {
+    color: rgb(11, 59, 56);
+    margin-bottom: 10px;
+    font-size: 1.2rem;
 }
-/* business card modal */
+
+.story-content {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 4px solid rgb(208, 113, 38);
+    margin-bottom: 15px;
+    white-space: pre-line;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* ============================================================
+   BUSINESS CARD MODAL
+   ============================================================ */
 #business-card-modal {
     background-color: rgba(0, 0, 0, 0.8);
 }
+
 #business-card-modal .modal-content {
     max-width: 600px;
     text-align: center;
 }
+
 #business-card-modal .modal-content img {
     max-width: 100%;
     height: auto;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
+
 .close-business-card {
     position: absolute;
     right: 15px;
@@ -864,40 +1039,14 @@ input[type="checkbox"]:checked::after {
     transition: color 0.2s;
     z-index: 1;
 }
+
 .close-business-card:hover {
     color: #000;
 }
 
-
-/* ========== SUBMIT BUTTON ========== */
-.submit-btn {
-    background-color: rgb(208, 113, 38);
-    color: white;
-    margin-top: 0 !important;
-    margin-bottom: 2px !important;
-    padding: 4px 10px;
-    width: 145px;
-}
-.submit-btn:hover {
-    background-color: rgb(218, 126, 53) !important;
-}
-
-
-/* ========== ANNIVERSARY BUTTON ========== */
-.anniversary-btn {
-    background-color: rgb(208, 113, 38) !important;
-    color: white !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    padding: 4px 10px;
-    width: 145px;
-}
-
-.anniversary-btn:hover {
-    background-color: rgb(218, 126, 53) !important;
-}
-
-/* ========== ANNIVERSARY MODAL ========== */
+/* ============================================================
+   ANNIVERSARY MODAL
+   ============================================================ */
 #anniversary-modal .modal-content {
     background-color: white;
     margin: 5% auto;
@@ -927,25 +1076,9 @@ input[type="checkbox"]:checked::after {
     color: #000;
 }
 
-/* Mobile responsive for anniversary modal */
-@media (max-width: 600px) {
-    #anniversary-modal .modal-content {
-        padding: 15px 18px;
-        margin: 2% auto;
-        width: 95%;
-        max-height: 90vh;
-    }
-
-    #anniversary-modal h2 {
-        font-size: 1.3rem !important;
-    }
-
-    #anniversary-modal .modal-content > div > div {
-        font-size: 0.85rem !important;
-    }
-}
-
-/* Help Popup Styles */
+/* ============================================================
+   HELP POPUP
+   ============================================================ */
 #help-popup {
     position: fixed;
     top: 0;
@@ -1053,61 +1186,21 @@ input[type="checkbox"]:checked::after {
     transform: scale(1.02);
 }
 
-/* Help Popup Animations */
 @keyframes helpFadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 @keyframes helpFadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Mobile responsiveness */
+/* ============================================================
+   MOBILE (≤ 600px) — all rules consolidated here
+   ============================================================ */
 @media (max-width: 600px) {
-    .splash-content {
-        padding: 1rem;
-        padding-bottom: 70px;
-        margin: 10px;
-    }
-
-    .splash-content h1 {
-        font-size: 1.3rem;
-        margin-bottom: 0.8rem;
-    }
-
-    .splash-text {
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
-
-    .primary-button {
-        padding: 0.7rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .nav-button {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-    }
-
-    .splash-navigation {
-        bottom: 15px;
-        gap: 10px;
-    }
-
+    /* Body layout */
     body {
         height: 100%;
         min-height: -webkit-fill-available;
@@ -1117,6 +1210,7 @@ input[type="checkbox"]:checked::after {
         height: calc(100vh - 120px);
     }
 
+    /* Header */
     .header-content {
         flex-direction: row;
         text-align: center;
@@ -1129,6 +1223,7 @@ input[type="checkbox"]:checked::after {
         font-size: 1.6rem;
     }
 
+    /* Leaflet controls */
     .leaflet-control-minimap {
         margin-bottom: 10px;
     }
@@ -1139,6 +1234,7 @@ input[type="checkbox"]:checked::after {
         font-family: "Changa", sans-serif;
     }
 
+    /* Year filter */
     #year-control {
         top: 68px;
         right: 5px;
@@ -1147,6 +1243,7 @@ input[type="checkbox"]:checked::after {
         font-size: 14px;
     }
 
+    /* Stats panel */
     #stats-control {
         bottom: 115px;
         left: 5px;
@@ -1188,6 +1285,7 @@ input[type="checkbox"]:checked::after {
         font-size: 14px;
     }
 
+    /* Layer control panel */
     .layer-control-container {
         width: 120px;
     }
@@ -1197,12 +1295,7 @@ input[type="checkbox"]:checked::after {
         font-size: 10px;
     }
 
-    input[type="checkbox"] {
-        width: 14px;
-        height: 14px;
-    }
-
-    /* Mobile button sizes */
+    /* Orange action buttons */
     .story-finder-btn {
         font-size: 11px;
         padding: 4px 10px;
@@ -1214,16 +1307,122 @@ input[type="checkbox"]:checked::after {
         width: 120px !important;
         font-size: 10px !important;
         padding: 4px 8px !important;
-        margin-top: 0px !important;
+        margin-top: 0 !important;
         margin-bottom: 1px !important;
     }
 
     .anniversary-btn {
         width: 120px !important;
-        margin-top: 0px !important;
-        margin-bottom: 0px !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
     }
 
+    /* Custom checkboxes */
+    input[type="checkbox"] {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Choropleth legend — SIZE ONLY. Position is set by JS. */
+    .choropleth-legend {
+        width: 122px;
+    }
+
+    .choropleth-legend .legend-header {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+
+    .choropleth-legend .legend-body {
+        padding: 5px 6px;
+    }
+
+    .choropleth-legend .legend-layer-selector {
+        gap: 3px;
+        margin-bottom: 5px;
+    }
+
+    .choropleth-legend .legend-layer-btn {
+        font-size: 9px;
+        padding: 3px 2px;
+        border-width: 1.5px;
+        line-height: 1.05;
+        letter-spacing: -0.2px;
+    }
+
+    .choropleth-legend .legend-enable-row {
+        font-size: 10px;
+        gap: 4px;
+        padding-bottom: 5px;
+        margin-bottom: 5px;
+    }
+
+    .choropleth-legend .legend-enable-row input[type="checkbox"] {
+        width: 12px;
+        height: 12px;
+    }
+
+    .choropleth-legend .legend-item {
+        font-size: 10px;
+        gap: 4px;
+        padding: 1px 0;
+    }
+
+    .choropleth-legend .legend-swatch {
+        width: 13px;
+        height: 10px;
+    }
+
+    /* Splash modal */
+    .splash-content {
+        padding: 1rem;
+        padding-bottom: 70px;
+        margin: 10px;
+    }
+
+    .splash-content h1 {
+        font-size: 1.3rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .splash-text {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .primary-button {
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .nav-button {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+
+    .splash-navigation {
+        bottom: 15px;
+        gap: 10px;
+    }
+
+    /* Anniversary modal */
+    #anniversary-modal .modal-content {
+        padding: 15px 18px;
+        margin: 2% auto;
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    #anniversary-modal h2 {
+        font-size: 1.3rem !important;
+    }
+
+    #anniversary-modal .modal-content > div > div {
+        font-size: 0.85rem !important;
+    }
+
+    /* Help popup */
     #help-popup .help-content {
         padding: 20px 25px;
         max-width: 100%;
@@ -1242,8 +1441,4 @@ input[type="checkbox"]:checked::after {
         font-size: 1rem;
         padding: 10px 20px;
     }
-}
-
-.leaflet-bottom {
-    padding-bottom: 10px;
 }

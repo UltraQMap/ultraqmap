@@ -1,54 +1,47 @@
-// Set up the map
-var mymap = L.map("map").setView([40, -42], 3);
+// ============================================================
+// MAP SETUP
+// ============================================================
+var mymap = L.map("map").setView([46, -52], 3);
 
-// Add basemaps
-var streets = L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_4id1_1_67fa8cb29c0242f5e904c9ec", {
-    attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: "abcd",
-    maxZoom: 20
-}).addTo(mymap);
+var streets = L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_4id1_1_67fa8cb29c0242f5e904c9ec",
+    {
+        attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: "abcd",
+        maxZoom: 20
+    }
+).addTo(mymap);
 
-// Create reset view button with help button below it
+// ============================================================
+// RESET VIEW / HELP / QR BUTTONS
+// ============================================================
 var ZoomOutControl = L.Control.extend({
     options: { position: "topleft" },
     onAdd: function (map) {
         var container = L.DomUtil.create("div", "custom-control-container");
 
-        // Reset view button - UPDATED with flyTo
         var button = L.DomUtil.create("button", "custom-button", container);
         button.title = "Reset view";
-        
-        // Add loading state to prevent multiple clicks
+
         var isResetting = false;
-        
         button.onclick = function () {
-            // Prevent multiple rapid clicks
             if (isResetting) return;
             isResetting = true;
-            
-            // Give visual feedback
-            button.style.opacity = '0.7';
-            button.style.transform = 'scale(0.95)';
-            
-            // Force map to recalculate its size for smoother rendering
+
+            button.style.opacity = "0.7";
+            button.style.transform = "scale(0.95)";
+
             map.invalidateSize();
-            
-            // Use flyTo for smooth animation instead of setView
-            map.flyTo([40, -42], 3, {
-                duration: 0.8,        // Animation duration in seconds
-                easeLinearity: 0.25    // Easing curve (0 = linear, 1 = ease out)
-            });
-            
-            // Reset button state after animation completes
-            setTimeout(function() {
-                button.style.opacity = '1';
-                button.style.transform = 'scale(1)';
+            map.flyTo([46, -52], 3, { duration: 0.8, easeLinearity: 0.25 });
+
+            setTimeout(function () {
+                button.style.opacity = "1";
+                button.style.transform = "scale(1)";
                 isResetting = false;
-            }, 900); // Slightly longer than animation duration
+            }, 900);
         };
 
-        // Help button
         var helpButton = L.DomUtil.create("button", "custom-help-button", container);
         helpButton.textContent = "?";
         helpButton.title = "About this map";
@@ -56,13 +49,11 @@ var ZoomOutControl = L.Control.extend({
             e.stopPropagation();
             showHelpPopup();
         };
-        
-        // QR button
+
         var qrButton = L.DomUtil.create("button", "custom-qr-button", container);
         qrButton.title = "Share this map";
         qrButton.onclick = function (e) {
             e.stopPropagation();
-            // Open business card modal
             var modal = document.getElementById("business-card-modal");
             if (modal) modal.style.display = "block";
         };
@@ -72,9 +63,10 @@ var ZoomOutControl = L.Control.extend({
 });
 new ZoomOutControl().addTo(mymap);
 
-// ========== HELP POPUP ========== //
+// ============================================================
+// HELP POPUP
+// ============================================================
 function showHelpPopup() {
-    // Remove existing help popup if any
     const existingPopup = document.getElementById("help-popup");
     if (existingPopup) {
         existingPopup.remove();
@@ -97,6 +89,7 @@ function showHelpPopup() {
         <p class="help-text">Underneath these layer controls is the <strong>"Find Photos/Stories"</strong> button which, when clicked, automatically zooms to a randomized show that has had photos and/or stories submitted for it.</p>
         <p class="help-text">Below that is the <strong>"Submit Photos/Stories"</strong> button which opens a Google Form where you can share your concert experiences.</p>
         <p class="help-text">Next is the <strong>"Today in UQ History"</strong> button which shows all shows that happened on this date in past years.</p>
+        <p class="help-text">Underneath this are two <strong>choropleth maps</strong> illustrating the density of Ultra Q shows by state/province/country. The first of these maps uses raw show counts to represent the number of times Ultra Q has played in each region. The second map divides this count by the area of the region to provide a better picture of the density of Ultra Q shows throughout North America and Europe.</p>
         <p class="help-text">In the top right corner of the map is a <strong>layer control</strong> box where shows can be filtered by year. Only show markers from years that are selected will show up on the map.</p>
         <p class="help-text">The bottom left corner shows the <strong>Top 5 Cities</strong> where Ultra Q have had shows. This stats panel updates depending on which years are selected to appear on the map.</p>
         <p class="help-divider">If you have any suggestions on ways to improve or things to add to the map, let me know via email <strong style="color: rgb(208, 113, 38)">(ultraqmap@gmail.com)</strong>, or send me a message on Instagram <strong style="color: rgb(208, 113, 38)">(<a href="https://www.instagram.com/ultraqmap/" target="_blank" rel="noopener noreferrer">@ultraqmap</a>)</strong>!</p>
@@ -106,7 +99,6 @@ function showHelpPopup() {
     popup.appendChild(content);
     document.body.appendChild(popup);
 
-    // Close handlers
     const closeBtn = content.querySelector(".help-close-btn");
     const gotItBtn = content.querySelector(".help-got-it-btn");
 
@@ -121,7 +113,9 @@ function showHelpPopup() {
     });
 }
 
-// Temporary notification helper
+// ============================================================
+// NOTIFICATION
+// ============================================================
 function showTemporaryNotification(message) {
     var notification = document.createElement("div");
     notification.textContent = message;
@@ -147,8 +141,8 @@ function showTemporaryNotification(message) {
         style.id = "fade-out-animation";
         style.textContent = `
             @keyframes fadeOut {
-                0% { opacity: 1; transform: translateY(0); }
-                70% { opacity: 1; transform: translateY(0); }
+                0%   { opacity: 1; transform: translateY(0); }
+                70%  { opacity: 1; transform: translateY(0); }
                 100% { opacity: 0; transform: translateY(-10px); visibility: hidden; }
             }
         `;
@@ -161,23 +155,30 @@ function showTemporaryNotification(message) {
     }, 3000);
 }
 
-// Create locator (inset) map
-var miniMap = new L.Control.MiniMap(L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_4id1_1_67fa8cb29c0242f5e904c9ec"), {
-    toggleDisplay: true,
-    position: "bottomright",
-    zoomLevelOffset: -6
-}).addTo(mymap);
+// ============================================================
+// MINI MAP + SCALE
+// ============================================================
+var miniMap = new L.Control.MiniMap(
+    L.tileLayer(
+        "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_4id1_1_67fa8cb29c0242f5e904c9ec"
+    ),
+    {
+        toggleDisplay: true,
+        position: "bottomright",
+        zoomLevelOffset: -6
+    }
+).addTo(mymap);
 
-// Add a scale bar to the map
 L.control.scale({ imperial: true, metric: true, position: "bottomleft" }).addTo(mymap);
 
-// ========== LAYER CONTROLS ========== //
+// ============================================================
+// LAYER CONTROLS (Donut Clusters / Heat Map)
+// ============================================================
 var clusterLayer = null;
 var heatmapLayer = null;
 var clusterEnabled = true;
 var heatmapEnabled = false;
 
-// Create layer control panel
 var LayerControl = L.Control.extend({
     options: { position: "topleft" },
     onAdd: function (map) {
@@ -190,7 +191,6 @@ var LayerControl = L.Control.extend({
         container.style.flexDirection = "column";
         container.style.gap = "5px";
 
-        // Cluster toggle button
         var clusterBtn = L.DomUtil.create("button", "layer-toggle-btn", container);
         clusterBtn.id = "cluster-toggle-btn";
         clusterBtn.style.cssText = `
@@ -207,39 +207,25 @@ var LayerControl = L.Control.extend({
             white-space: nowrap;
         `;
 
-        // Create checkbox inside button
         var clusterCheckbox = L.DomUtil.create("input", "", clusterBtn);
         clusterCheckbox.type = "checkbox";
         clusterCheckbox.checked = clusterEnabled;
-        clusterCheckbox.style.cssText = `
-            width: 14px;
-            height: 14px;
-            cursor: pointer;
-            margin: 0;
-        `;
+        clusterCheckbox.style.cssText = `width: 14px; height: 14px; cursor: pointer; margin: 0;`;
 
         var clusterLabel = L.DomUtil.create("span", "", clusterBtn);
         clusterLabel.textContent = "Donut Clusters";
 
-        // Heatmap toggle button
         var heatmapBtn = L.DomUtil.create("button", "layer-toggle-btn", container);
         heatmapBtn.id = "heatmap-toggle-btn";
 
-        // Create checkbox inside button
         var heatmapCheckbox = L.DomUtil.create("input", "", heatmapBtn);
         heatmapCheckbox.type = "checkbox";
         heatmapCheckbox.checked = heatmapEnabled;
-        heatmapCheckbox.style.cssText = `
-            width: 14px;
-            height: 14px;
-            cursor: pointer;
-            margin: 0;
-        `;
+        heatmapCheckbox.style.cssText = `width: 14px; height: 14px; cursor: pointer; margin: 0;`;
 
         var heatmapLabel = L.DomUtil.create("span", "", heatmapBtn);
         heatmapLabel.textContent = "Heat Map";
 
-        // Update button styles based on checkbox state
         function updateClusterButtonStyle() {
             if (clusterCheckbox.checked) {
                 clusterBtn.style.backgroundColor = "rgb(11, 59, 56)";
@@ -254,7 +240,6 @@ var LayerControl = L.Control.extend({
 
         function updateHeatmapButtonStyle() {
             if (heatmapCheckbox.checked) {
-                // Changed from orange to teal to match cluster button
                 heatmapBtn.style.backgroundColor = "rgb(11, 59, 56)";
                 heatmapBtn.style.color = "white";
                 heatmapLabel.style.color = "white";
@@ -265,7 +250,6 @@ var LayerControl = L.Control.extend({
             }
         }
 
-        // Add click handlers for checkboxes
         clusterCheckbox.addEventListener("change", function (e) {
             e.stopPropagation();
             toggleClusters(this.checked);
@@ -278,9 +262,7 @@ var LayerControl = L.Control.extend({
             updateHeatmapButtonStyle();
         });
 
-        // Also allow clicking the button to toggle checkbox
         clusterBtn.addEventListener("click", function (e) {
-            // Don't trigger if clicking directly on checkbox
             if (e.target !== clusterCheckbox) {
                 clusterCheckbox.checked = !clusterCheckbox.checked;
                 toggleClusters(clusterCheckbox.checked);
@@ -289,7 +271,6 @@ var LayerControl = L.Control.extend({
         });
 
         heatmapBtn.addEventListener("click", function (e) {
-            // Don't trigger if clicking directly on checkbox
             if (e.target !== heatmapCheckbox) {
                 heatmapCheckbox.checked = !heatmapCheckbox.checked;
                 toggleHeatmap(heatmapCheckbox.checked);
@@ -297,17 +278,269 @@ var LayerControl = L.Control.extend({
             }
         });
 
-        // Set initial styles
         updateClusterButtonStyle();
         updateHeatmapButtonStyle();
 
         return container;
     }
 });
-
 new LayerControl().addTo(mymap);
 
-// ========== RANDOM STORY FINDER CONTROL ========== //
+// ============================================================
+// CHOROPLETH LAYERS
+// ============================================================
+const CHOROPLETH_URL =
+    "https://api.maptiler.com/data/01a1bb89-20b5-7b60-a3e4-91e501d944c8/features.json?key=PIBJEhoWmTHAFpfjurUO";
+
+function makeChoroplethStyle(countField, colorFn, minDataThreshold) {
+    return function (feature) {
+        const count = feature.properties[countField];
+        const hasData = count > minDataThreshold;
+        return {
+            weight: 1,
+            color: "white",
+            opacity: hasData ? 1 : 0,
+            fillColor: colorFn(count),
+            fillOpacity: 0.8
+        };
+    };
+}
+
+function makeChoroplethPopup(countField, label, decimals) {
+    return function (feature, layer) {
+        const p = feature.properties;
+        const raw = p[countField];
+        const display = typeof decimals === "number" && typeof raw === "number" ? raw.toFixed(decimals) : raw;
+        layer.bindPopup(`
+            <h3 style="margin:0 0 4px 0;">${p.shapeName}</h3>
+            <div style="font-size:12px;color:#666;margin-bottom:6px;">Ultra Q Shows 2019–2026</div>
+            <p style="margin:0;"><b>${label}:</b> ${display}</p>
+        `);
+    };
+}
+
+function rawColor(show_count) {
+    return show_count > 16
+        ? "#8f4e1a"
+        : show_count > 10
+          ? "#d07126"
+          : show_count > 5
+            ? "#de8c4b"
+            : show_count > 2
+              ? "#eab68c"
+              : show_count > 0.9
+                ? "#f6dfcd"
+                : "transparent";
+}
+
+window.rawChoroplethLayer = new L.GeoJSON.AJAX(CHOROPLETH_URL, {
+    onEachFeature: makeChoroplethPopup("location_count_1_Show_Count", "Show Count"),
+    style: makeChoroplethStyle("location_count_1_Show_Count", rawColor, 0.9)
+});
+
+function normalizedColor(show_count) {
+    return show_count > 0.000098
+        ? "#8f4e1a"
+        : show_count > 0.000054
+          ? "#d07126"
+          : show_count > 0.000033
+            ? "#de8c4b"
+            : show_count > 0.000015
+              ? "#eab68c"
+              : show_count > 0.000001
+                ? "#f6dfcd"
+                : "transparent";
+}
+
+window.normalizedChoroplethLayer = new L.GeoJSON.AJAX(CHOROPLETH_URL, {
+    onEachFeature: makeChoroplethPopup("location_count_1_Count_Area", "Shows per km²", 6),
+    style: makeChoroplethStyle("location_count_1_Count_Area", normalizedColor, 0.000001)
+});
+
+// ============================================================
+// CHOROPLETH LEGEND CONTROL (single toggle)
+// ============================================================
+window.activeChoropleth = null;
+
+var ChoroplethLegendControl = L.Control.extend({
+    options: {
+        position: "topleft",
+        topOffsetPx: 184,
+        mobileTopOffsetPx: 164,
+        leftOffsetPx: 36,
+        mobileLeftOffsetPx: 36,
+        mobileBreakpointPx: 600
+    },
+
+    onAdd: function (map) {
+        var opts = this.options;
+        var container = L.DomUtil.create("div", "choropleth-legend-stack");
+
+        container.style.position = "absolute";
+        container.style.zIndex = "1000";
+
+        // Use a live media query so the offset updates on resize / rotate,
+        // not just at initial load. Single source of truth for positioning.
+        var mq = window.matchMedia("(max-width: " + opts.mobileBreakpointPx + "px)");
+
+        function applyPosition() {
+            var mobile = mq.matches;
+            container.style.top = (mobile ? opts.mobileTopOffsetPx : opts.topOffsetPx) + "px";
+            container.style.left = (mobile ? opts.mobileLeftOffsetPx : opts.leftOffsetPx) + "px";
+        }
+
+        applyPosition();
+
+        // Live updates on resize / orientation change
+        if (mq.addEventListener) {
+            mq.addEventListener("change", applyPosition);
+        } else if (mq.addListener) {
+            // Safari < 14
+            mq.addListener(applyPosition);
+        }
+
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.disableScrollPropagation(container);
+
+        // ---- Layer configs ----
+        var LAYERS = {
+            raw: {
+                key: "raw",
+                title: "Raw Show Count",
+                layerRef: function () {
+                    return window.rawChoroplethLayer;
+                },
+                buckets: [
+                    { color: "#8f4e1a", label: "17+" },
+                    { color: "#d07126", label: "11 – 16" },
+                    { color: "#de8c4b", label: "6 – 10" },
+                    { color: "#eab68c", label: "3 – 5" },
+                    { color: "#f6dfcd", label: "1 – 2" }
+                ]
+            },
+            normalized: {
+                key: "normalized",
+                title: "Show Density (per km²)",
+                layerRef: function () {
+                    return window.normalizedChoroplethLayer;
+                },
+                buckets: [
+                    { color: "#8f4e1a", label: "Highest density" },
+                    { color: "#d07126", label: "High density" },
+                    { color: "#de8c4b", label: "Medium density" },
+                    { color: "#eab68c", label: "Low density" },
+                    { color: "#f6dfcd", label: "Lowest density" }
+                ]
+            }
+        };
+
+        // ---- Build legend block ----
+        var legend = L.DomUtil.create("div", "choropleth-legend collapsed", container);
+
+        var header = L.DomUtil.create("div", "legend-header", legend);
+        header.innerHTML =
+            `<span class="legend-title-text">Choropleth Maps</span>` + `<span class="legend-toggle-icon">▸</span>`;
+        var icon = header.querySelector(".legend-toggle-icon");
+
+        var body = L.DomUtil.create("div", "legend-body", legend);
+
+        var enableRow = L.DomUtil.create("label", "legend-enable-row", body);
+        var enableCheckbox = L.DomUtil.create("input", "", enableRow);
+        enableCheckbox.type = "checkbox";
+        enableCheckbox.checked = false;
+        var enableLabel = L.DomUtil.create("span", "", enableRow);
+        enableLabel.textContent = "Activate Layer";
+
+        var selectorRow = L.DomUtil.create("div", "legend-layer-selector", body);
+
+        function buildSelectorButton(key) {
+            var cfg = LAYERS[key];
+            var btn = L.DomUtil.create("button", "legend-layer-btn", selectorRow);
+            btn.type = "button";
+            btn.dataset.layer = key;
+            btn.textContent = key === "raw" ? "Raw Count" : "Density";
+            btn.title = cfg.title;
+            btn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                if (window.activeChoropleth === key) return;
+                activateChoropleth(key);
+            });
+            return btn;
+        }
+        var rawBtn = buildSelectorButton("raw");
+        var normBtn = buildSelectorButton("normalized");
+
+        var swatchContainer = L.DomUtil.create("div", "legend-swatches", body);
+
+        function rebuildSwatches(which) {
+            swatchContainer.innerHTML = "";
+            if (!which) return;
+            LAYERS[which].buckets.forEach(function (b) {
+                var item = L.DomUtil.create("div", "legend-item", swatchContainer);
+                var swatch = L.DomUtil.create("span", "legend-swatch", item);
+                swatch.style.background = b.color;
+                var text = L.DomUtil.create("span", "", item);
+                text.textContent = b.label;
+            });
+        }
+
+        function activateChoropleth(which) {
+            ["raw", "normalized"].forEach(function (key) {
+                var layer = LAYERS[key].layerRef();
+                if (layer && map.hasLayer(layer)) map.removeLayer(layer);
+            });
+
+            window.activeChoropleth = which;
+
+            if (which) {
+                var layer = LAYERS[which].layerRef();
+                if (layer && !map.hasLayer(layer)) layer.addTo(map);
+            }
+
+            enableCheckbox.checked = !!which;
+            rawBtn.classList.toggle("active", which === "raw");
+            normBtn.classList.toggle("active", which === "normalized");
+
+            rebuildSwatches(which);
+
+            if (which) {
+                legend.classList.remove("collapsed");
+                icon.textContent = "▾";
+            }
+        }
+
+        header.addEventListener("click", function () {
+            legend.classList.toggle("collapsed");
+            icon.textContent = legend.classList.contains("collapsed") ? "▸" : "▾";
+        });
+
+        enableCheckbox.addEventListener("change", function (e) {
+            e.stopPropagation();
+            if (this.checked) {
+                activateChoropleth(window.activeChoropleth || "raw");
+            } else {
+                activateChoropleth(null);
+            }
+        });
+
+        enableRow.addEventListener("click", function (e) {
+            if (e.target !== enableCheckbox) {
+                enableCheckbox.checked = !enableCheckbox.checked;
+                enableCheckbox.dispatchEvent(new Event("change"));
+            }
+        });
+
+        activateChoropleth(null);
+
+        return container;
+    }
+});
+
+new ChoroplethLegendControl().addTo(mymap);
+
+// ============================================================
+// ACTION BUTTONS (Find / Submit / Anniversary)
+// ============================================================
 var StoryFinderControl = L.Control.extend({
     options: { position: "topleft" },
     onAdd: function (map) {
@@ -315,19 +548,15 @@ var StoryFinderControl = L.Control.extend({
         button.innerHTML = "Find Photos/Stories";
         button.title = "Find a random show with photos or stories";
 
-        // Add hover effects
         button.addEventListener("mouseenter", function () {
             this.style.backgroundColor = "rgb(218,126,53)";
             this.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
         });
-
         button.addEventListener("mouseleave", function () {
             this.style.transform = "scale(1)";
             this.style.backgroundColor = "rgb(208, 113, 38)";
             this.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
         });
-
-        // Click handler
         button.addEventListener("click", function (e) {
             e.stopPropagation();
             findRandomStory();
@@ -336,11 +565,8 @@ var StoryFinderControl = L.Control.extend({
         return button;
     }
 });
-
-// Add the control to the map
 new StoryFinderControl().addTo(mymap);
 
-// ========== SUBMIT PHOTO/STORY CONTROL ========== //
 var SubmitControl = L.Control.extend({
     options: { position: "topleft" },
     onAdd: function (map) {
@@ -350,32 +576,28 @@ var SubmitControl = L.Control.extend({
         button.style.backgroundColor = "rgb(208, 113, 38)";
         button.style.color = "white";
 
-        // Add hover effects
         button.addEventListener("mouseenter", function () {
             this.style.backgroundColor = "rgb(218,126,53)";
             this.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
         });
-
         button.addEventListener("mouseleave", function () {
             this.style.transform = "scale(1)";
             this.style.backgroundColor = "rgb(208, 113, 38)";
             this.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
         });
-
-        // Click handler - open the Google Form in a new tab
         button.addEventListener("click", function (e) {
             e.stopPropagation();
-            window.open("https://docs.google.com/forms/d/e/1FAIpQLSerjweiGwejyVxnbYcIk_LWk8W_3PQZixh8N9DtJifwg9Qn2w/viewform?usp=sharing&ouid=115915436845269291117", "_blank");
+            window.open(
+                "https://docs.google.com/forms/d/e/1FAIpQLSerjweiGwejyVxnbYcIk_LWk8W_3PQZixh8N9DtJifwg9Qn2w/viewform?usp=sharing&ouid=115915436845269291117",
+                "_blank"
+            );
         });
 
         return button;
     }
 });
-
-// Add the control to the map
 new SubmitControl().addTo(mymap);
 
-// ========== ANNIVERSARY REMINDER CONTROL ========== //
 var AnniversaryControl = L.Control.extend({
     options: { position: "topleft" },
     onAdd: function (map) {
@@ -385,19 +607,15 @@ var AnniversaryControl = L.Control.extend({
         button.style.backgroundColor = "rgb(208, 113, 38)";
         button.style.color = "white";
 
-        // Add hover effects
         button.addEventListener("mouseenter", function () {
             this.style.backgroundColor = "rgb(218,126,53)";
             this.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
         });
-
         button.addEventListener("mouseleave", function () {
             this.style.transform = "scale(1)";
             this.style.backgroundColor = "rgb(208, 113, 38)";
             this.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
         });
-
-        // Click handler
         button.addEventListener("click", function (e) {
             e.stopPropagation();
             showAnniversaryReminders();
@@ -406,11 +624,11 @@ var AnniversaryControl = L.Control.extend({
         return button;
     }
 });
-
-// Add the control to the map
 new AnniversaryControl().addTo(mymap);
 
-// ========== ANNIVERSARY REMINDER FUNCTIONALITY ========== //
+// ============================================================
+// ANNIVERSARY REMINDERS
+// ============================================================
 function showAnniversaryReminders() {
     if (!window.showsData) {
         console.error("Show data not loaded");
@@ -418,10 +636,9 @@ function showAnniversaryReminders() {
     }
 
     const today = new Date();
-    const todayMonth = today.getMonth() + 1; // JavaScript months are 0-indexed
+    const todayMonth = today.getMonth() + 1;
     const todayDay = today.getDate();
 
-    // Get month name
     const monthNames = [
         "January",
         "February",
@@ -438,24 +655,17 @@ function showAnniversaryReminders() {
     ];
     const monthName = monthNames[today.getMonth()];
 
-    // Find shows that happened on this date in any year
     const anniversaryShows = window.showsData.filter((show) => {
-        // Parse the show date
         const monthIndex = monthNames.indexOf(show.Month);
         const showMonth = monthIndex + 1;
         const showDay = parseInt(show.Day);
-
         return showMonth === todayMonth && showDay === todayDay;
     });
 
-    // Sort by year (most recent first)
     anniversaryShows.sort((a, b) => b.Year - a.Year);
 
-    // Create the modal
     const existingModal = document.getElementById("anniversary-modal");
-    if (existingModal) {
-        existingModal.remove();
-    }
+    if (existingModal) existingModal.remove();
 
     const modal = document.createElement("div");
     modal.id = "anniversary-modal";
@@ -470,7 +680,6 @@ function showAnniversaryReminders() {
     content.style.overflowY = "auto";
     content.style.position = "relative";
 
-    // Build the content
     let html = `
         <span class="close-anniversary" style="position:absolute;right:10px;top:5px;font-size:28px;cursor:pointer;color:#333;">&times;</span>
         <h2 style="color:rgb(11,59,56);font-family:'Changa',sans-serif;margin-bottom:5px;font-size:1.8rem;">Today in UQ History</h2>
@@ -485,7 +694,6 @@ function showAnniversaryReminders() {
             </div>
         `;
     } else {
-        // Group by year for display
         const years = [...new Set(anniversaryShows.map((s) => s.Year))].sort((a, b) => b - a);
 
         html += `<div style="margin-top:10px;">`;
@@ -506,7 +714,6 @@ function showAnniversaryReminders() {
                 const location =
                     show.State && show.State !== "" ? `${show.City}, ${show.State}` : `${show.City}, ${show.Country}`;
 
-                // Check if show has photos or stories
                 const paddedID = show.ID.toString().padStart(4, "0");
                 const hasPhotos = allPhotosCache && allPhotosCache.some((f) => f.startsWith(paddedID));
                 const hasStories = allStoriesCache && allStoriesCache[paddedID] && allStoriesCache[paddedID].length > 0;
@@ -540,90 +747,82 @@ function showAnniversaryReminders() {
     modal.appendChild(content);
     document.body.appendChild(modal);
 
-    // Close handlers
     const closeBtn = content.querySelector(".close-anniversary");
-    const closeModal = () => {
-        modal.remove();
-    };
+    const closeModal = () => modal.remove();
 
     closeBtn.addEventListener("click", closeModal);
     modal.addEventListener("click", function (e) {
         if (e.target === this) closeModal();
     });
 
-    // Also close with Escape key
     document.addEventListener("keydown", function (e) {
         if (e.key === "Escape") {
-            const modal = document.getElementById("anniversary-modal");
-            if (modal) modal.remove();
+            const m = document.getElementById("anniversary-modal");
+            if (m) m.remove();
         }
     });
 }
 
-// ========== GLOBAL ZOOM TO SHOW FUNCTION ========== //
-// Make this function globally accessible for the onclick handler in the anniversary modal
-window.zoomToShow = function(showID, venue, lat, lng, city, year) {
+// ============================================================
+// GLOBAL ZOOM-TO-SHOW
+// ============================================================
+window.zoomToShow = function (showID, venue, lat, lng, city, year) {
     if (!window.showsData) {
         console.error("Show data not loaded");
         return;
     }
 
-    // Find the show data
     let show = window.showsData.find((s) => s.ID === showID);
     if (!show) {
-        // If we have the data passed directly, use it
         if (lat && lng) {
-            show = { ID: showID, Venue: venue || "", City: city || "", Year: year || "", Latitude: lat, Longitude: lng };
+            show = {
+                ID: showID,
+                Venue: venue || "",
+                City: city || "",
+                Year: year || "",
+                Latitude: lat,
+                Longitude: lng
+            };
         } else {
             console.error("Show not found:", showID);
             return;
         }
     }
 
-    // Close the anniversary modal
     const modal = document.getElementById("anniversary-modal");
     if (modal) modal.remove();
 
-    // Zoom to the show location - Updated to use flyTo
     mymap.flyTo([show.Latitude, show.Longitude], 18, {
         duration: 1.0,
         easeLinearity: 0.25
     });
 
-    // Try to find and open the marker after animation completes
     setTimeout(() => {
         let markerFound = false;
 
-        // First try to find by exact location match
         allMarkers.forEach((marker) => {
             const latLng = marker.getLatLng();
-            if (Math.abs(latLng.lat - show.Latitude) < 0.0005 &&
-                Math.abs(latLng.lng - show.Longitude) < 0.0005) {
+            if (Math.abs(latLng.lat - show.Latitude) < 0.0005 && Math.abs(latLng.lng - show.Longitude) < 0.0005) {
                 try {
                     marker.openPopup();
                     markerFound = true;
-                    console.log("Marker found and opened by location");
                 } catch (e) {
                     console.log("Could not open popup:", e);
                 }
             }
         });
 
-        // If not found, try by matching popup content
         if (!markerFound) {
             allMarkers.forEach((marker) => {
-                const popupContent = marker.getPopup().getContent();
+                const popupContent = marker.getPopup() && marker.getPopup().getContent();
                 if (popupContent) {
-                    // Check if this marker matches the show
                     const venueMatch = show.Venue && popupContent.includes(show.Venue);
                     const cityMatch = show.City && popupContent.includes(show.City);
                     const yearMatch = show.Year && popupContent.includes(show.Year.toString());
-                    
                     if (venueMatch || (cityMatch && yearMatch)) {
                         try {
                             marker.openPopup();
                             markerFound = true;
-                            console.log("Marker found and opened by popup content");
                         } catch (e) {
                             console.log("Could not open popup:", e);
                         }
@@ -632,16 +831,13 @@ window.zoomToShow = function(showID, venue, lat, lng, city, year) {
             });
         }
 
-        // If still not found, try to find by coordinates with a larger tolerance
         if (!markerFound) {
             allMarkers.forEach((marker) => {
                 const latLng = marker.getLatLng();
-                if (Math.abs(latLng.lat - show.Latitude) < 0.01 &&
-                    Math.abs(latLng.lng - show.Longitude) < 0.01) {
+                if (Math.abs(latLng.lat - show.Latitude) < 0.01 && Math.abs(latLng.lng - show.Longitude) < 0.01) {
                     try {
                         marker.openPopup();
                         markerFound = true;
-                        console.log("Marker found and opened by approximate location");
                     } catch (e) {
                         console.log("Could not open popup:", e);
                     }
@@ -650,15 +846,15 @@ window.zoomToShow = function(showID, venue, lat, lng, city, year) {
         }
 
         if (!markerFound) {
-            console.log("Could not find the marker for this show, but zoomed to its location!");
-            // Show a temporary notification
             const displayName = show.Venue || show.City || "show";
             showTemporaryNotification(`📍 ${displayName} — ${show.City || ""} ${show.Year || ""}`);
         }
-    }, 1200); // Slightly longer than flyTo duration
+    }, 1200);
 };
 
-// ========== GLOBAL VARIABLES ========== //
+// ============================================================
+// GLOBAL STATE + MARKERS
+// ============================================================
 var markersByYear = {};
 var visibleYears = new Set();
 var allMarkers = [];
@@ -674,7 +870,6 @@ const yearColors = {
     2026: "#6623bd"
 };
 
-// Custom map marker icons
 var ShowIcon = L.Icon.extend({
     options: { iconSize: [20, 30], iconAnchor: [10, 30], popupAnchor: [0, -20] }
 });
@@ -690,7 +885,9 @@ var iconMap = {
     2026: new ShowIcon({ iconUrl: "MapMarkers/2026_marker2.png" })
 };
 
-// Create a custom cluster icon function
+// ============================================================
+// DONUT CLUSTER ICON
+// ============================================================
 function createClusterIcon(cluster) {
     var markers = cluster.getAllChildMarkers();
     var years = {};
@@ -710,7 +907,9 @@ function createClusterIcon(cluster) {
 
     if (uniqueYears.size === 1) {
         const year = uniqueYears.values().next().value;
-        svg += `<circle cx="${radius}" cy="${radius}" r="${radius - weight / 2}" stroke="${yearColors[year] || "#555"}" stroke-width="${weight}" fill="none" />`;
+        svg += `<circle cx="${radius}" cy="${radius}" r="${radius - weight / 2}" stroke="${
+            yearColors[year] || "#555"
+        }" stroke-width="${weight}" fill="none" />`;
     } else {
         var total = markers.length;
         var startAngle = -Math.PI / 2;
@@ -722,7 +921,9 @@ function createClusterIcon(cluster) {
             var x2 = radius + Math.cos(endAngle) * (radius - weight / 2);
             var y2 = radius + Math.sin(endAngle) * (radius - weight / 2);
             var largeArc = percentage > 0.5 ? 1 : 0;
-            svg += `<path d="M ${x1} ${y1} A ${radius - weight / 2} ${radius - weight / 2} 0 ${largeArc} 1 ${x2} ${y2}" stroke="${yearColors[year]}" stroke-width="${weight}" fill="none" />`;
+            svg += `<path d="M ${x1} ${y1} A ${radius - weight / 2} ${
+                radius - weight / 2
+            } 0 ${largeArc} 1 ${x2} ${y2}" stroke="${yearColors[year]}" stroke-width="${weight}" fill="none" />`;
             startAngle = endAngle;
         });
     }
@@ -731,7 +932,6 @@ function createClusterIcon(cluster) {
     return L.divIcon({ html: svg, className: "donut-cluster", iconSize: [size, size] });
 }
 
-// Create marker cluster group
 var markerClusterGroup = L.markerClusterGroup({
     maxClusterRadius: 50,
     spiderfyDistanceMultiplier: 1,
@@ -739,17 +939,16 @@ var markerClusterGroup = L.markerClusterGroup({
     iconCreateFunction: createClusterIcon
 });
 
-// ========== LAYER MANAGEMENT FUNCTIONS ========== //
+// ============================================================
+// LAYER MANAGEMENT
+// ============================================================
 function refreshClusterLayer() {
-    // Remove existing cluster layer if it exists
     if (clusterLayer) {
         mymap.removeLayer(clusterLayer);
         clusterLayer = null;
     }
 
-    // Only add markers if clusters are enabled
     if (clusterEnabled) {
-        // Get visible markers based on selected years
         var visibleMarkers = [];
         Object.keys(markersByYear).forEach((year) => {
             if (visibleYears.has(year)) {
@@ -758,19 +957,13 @@ function refreshClusterLayer() {
         });
 
         if (visibleMarkers.length > 0) {
-            // Create new cluster layer with visible markers
             markerClusterGroup.clearLayers();
             visibleMarkers.forEach(function (marker) {
                 markerClusterGroup.addLayer(marker);
             });
             clusterLayer = markerClusterGroup;
             mymap.addLayer(clusterLayer);
-            console.log("Clusters enabled - showing", visibleMarkers.length, "markers in clusters");
-        } else {
-            console.log("No markers to display");
         }
-    } else {
-        console.log("Clusters disabled - no markers showing");
     }
 }
 
@@ -782,20 +975,16 @@ function toggleClusters(enabled) {
 function refreshHeatmapLayer() {
     if (!window.showsData) return;
 
-    // Remove existing heatmap layer
     if (heatmapLayer) {
         mymap.removeLayer(heatmapLayer);
         heatmapLayer = null;
     }
 
     if (heatmapEnabled) {
-        // Filter shows by visible years
         const visibleShows = window.showsData.filter((show) => visibleYears.has(show.Year.toString()));
-
-        // Generate heat points (each show contributes equally)
         var heatPoints = generateHeatmapData(visibleShows);
 
-        var heatOptions = {
+        heatmapLayer = L.heatLayer(heatPoints, {
             radius: 30,
             blur: 30,
             maxZoom: 17,
@@ -807,11 +996,8 @@ function refreshHeatmapLayer() {
                 0.8: "#bd232d",
                 1.0: "#bd237a"
             }
-        };
-
-        heatmapLayer = L.heatLayer(heatPoints, heatOptions);
+        });
         heatmapLayer.addTo(mymap);
-        console.log("Heatmap enabled - showing", visibleShows.length, "shows");
     }
 }
 
@@ -820,177 +1006,110 @@ function toggleHeatmap(enabled) {
     refreshHeatmapLayer();
 }
 
-// Generate heat map data - each show contributes equally (intensity = 1)
 function generateHeatmapData(showsData) {
     if (!showsData || showsData.length === 0) return [];
-
     var heatPoints = [];
-
     showsData.forEach(function (show) {
         if (show.Latitude && show.Longitude) {
-            // Each show gets equal intensity (1)
             heatPoints.push([show.Latitude, show.Longitude, 1]);
         }
     });
-
-    console.log(`Generated ${heatPoints.length} heat points from ${showsData.length} shows`);
     return heatPoints;
 }
 
-// ========== RANDOM STORY FINDER ========== //
-// Track the last selected show to avoid repeats
+// ============================================================
+// RANDOM STORY FINDER
+// ============================================================
 let lastSelectedShowID = null;
 
 async function findRandomStory() {
-    // Make sure all data is loaded first
-    if (!window.showsData) {
-        return;
-    }
+    if (!window.showsData) return;
+    if (!allPhotosCache) await loadAllPhotos();
+    if (!allStoriesCache) await loadAllStories();
 
-    // Load photos and stories if not already loaded
-    if (!allPhotosCache) {
-        await loadAllPhotos();
-    }
-
-    if (!allStoriesCache) {
-        await loadAllStories();
-    }
-
-    // Get currently visible years from the filter
     const visibleYearsArray = Array.from(visibleYears);
+    if (visibleYearsArray.length === 0) return;
 
-    // If no years are selected, return
-    if (visibleYearsArray.length === 0) {
-        return;
-    }
+    const visibleShows = window.showsData.filter((show) => visibleYearsArray.includes(show.Year.toString()));
+    if (visibleShows.length === 0) return;
 
-    // Filter shows to only those from visible years
-    const visibleShows = window.showsData.filter((show) => {
-        const yearStr = show.Year.toString();
-        return visibleYearsArray.includes(yearStr);
-    });
-
-    if (visibleShows.length === 0) {
-        return;
-    }
-
-    // Now check for shows with media among the visible shows
     let showsWithMedia = visibleShows.filter((show) => {
         const paddedID = show.ID.toString().padStart(4, "0");
-        // Check if show has photos or stories
-        const hasPhotos = allPhotosCache && allPhotosCache.some((filename) => filename.startsWith(paddedID));
+        const hasPhotos = allPhotosCache && allPhotosCache.some((f) => f.startsWith(paddedID));
         const hasStories = allStoriesCache && allStoriesCache[paddedID] && allStoriesCache[paddedID].length > 0;
         return hasPhotos || hasStories;
     });
 
-    if (showsWithMedia.length === 0) {
-        return;
-    }
+    if (showsWithMedia.length === 0) return;
 
-    // If there's more than one show with media, remove the last one shown
     if (showsWithMedia.length > 1 && lastSelectedShowID !== null) {
         showsWithMedia = showsWithMedia.filter((show) => show.ID !== lastSelectedShowID);
-
-        // If filtering removed all shows (should only happen if there was only 1 show with media), use the full list again
         if (showsWithMedia.length === 0) {
             showsWithMedia = visibleShows.filter((show) => {
                 const paddedID = show.ID.toString().padStart(4, "0");
-                const hasPhotos = allPhotosCache && allPhotosCache.some((filename) => filename.startsWith(paddedID));
+                const hasPhotos = allPhotosCache && allPhotosCache.some((f) => f.startsWith(paddedID));
                 const hasStories = allStoriesCache && allStoriesCache[paddedID] && allStoriesCache[paddedID].length > 0;
                 return hasPhotos || hasStories;
             });
         }
     }
 
-    // Pick a random show from the filtered list
     const randomIndex = Math.floor(Math.random() * showsWithMedia.length);
     const selectedShow = showsWithMedia[randomIndex];
-
-    // Store the selected show ID to avoid repeats
     lastSelectedShowID = selectedShow.ID;
 
-    // First, zoom to the show location using flyTo
     mymap.flyTo([selectedShow.Latitude, selectedShow.Longitude], 18, {
         duration: 1.0,
         easeLinearity: 0.25
     });
 
-    // Wait for the map to finish zooming and for clusters to update
     setTimeout(() => {
-        // Function to find and open the marker
         function findAndOpenMarker() {
             let markerFound = false;
 
-            // First check if clusters are enabled
             if (clusterEnabled && clusterLayer) {
-                // Try to find the marker within the cluster and check if the marker is in the cluster
                 allMarkers.forEach((marker) => {
-                    const latLng = marker.getLatLng();
                     const popupContent = marker.getPopup().getContent();
-
-                    // Check if this marker matches the selected show
                     if (
                         popupContent.includes(selectedShow.Venue) &&
                         popupContent.includes(selectedShow.City) &&
                         popupContent.includes(selectedShow.Year.toString())
                     ) {
-                        // Check if the marker is currently visible (not in a hidden cluster) and try to open it directly
                         try {
-                            // If the marker is in a cluster, force the cluster to open
                             const allLayers = markerClusterGroup.getLayers();
                             const markerInCluster = allLayers.some((layer) => {
-                                // Check if this is the marker we want
                                 if (layer === marker) return true;
-                                // If it's a cluster, check if it contains our marker
                                 if (layer.getChildCount && layer.getAllChildMarkers) {
-                                    const childMarkers = layer.getAllChildMarkers();
-                                    return childMarkers.includes(marker);
+                                    return layer.getAllChildMarkers().includes(marker);
                                 }
                                 return false;
                             });
 
                             if (markerInCluster) {
-                                // The marker is in a cluster - need to zoom in more
                                 const currentZoom = mymap.getZoom();
                                 if (currentZoom < 18) {
                                     mymap.flyTo([selectedShow.Latitude, selectedShow.Longitude], currentZoom + 1, {
                                         duration: 0.5,
                                         easeLinearity: 0.25
                                     });
-                                    // Try again after zoom
                                     setTimeout(() => {
                                         try {
                                             marker.openPopup();
                                             markerFound = true;
-                                        } catch (e) {
-                                            console.log("Could not open popup after zoom");
-                                        }
+                                        } catch (e) {}
                                     }, 600);
                                 } else {
-                                    // Already at high zoom, try to open directly
-                                    try {
-                                        marker.openPopup();
-                                        markerFound = true;
-                                    } catch (e) {
-                                        console.log("Could not open popup at high zoom");
-                                    }
-                                }
-                            } else {
-                                // Marker is not in a cluster, open directly
-                                try {
                                     marker.openPopup();
                                     markerFound = true;
-                                } catch (e) {
-                                    console.log("Could not open popup directly");
                                 }
+                            } else {
+                                marker.openPopup();
+                                markerFound = true;
                             }
-                        } catch (e) {
-                            console.log("Error opening marker:", e);
-                        }
+                        } catch (e) {}
                     }
                 });
             } else {
-                // Clusters are disabled, search through all markers directly
                 allMarkers.forEach((marker) => {
                     const popupContent = marker.getPopup().getContent();
                     if (
@@ -1001,14 +1120,11 @@ async function findRandomStory() {
                         try {
                             marker.openPopup();
                             markerFound = true;
-                        } catch (e) {
-                            console.log("Could not open popup:", e);
-                        }
+                        } catch (e) {}
                     }
                 });
             }
 
-            // If we couldn't find the exact marker, try by location
             if (!markerFound) {
                 allMarkers.forEach((marker) => {
                     const latLng = marker.getLatLng();
@@ -1019,36 +1135,23 @@ async function findRandomStory() {
                         try {
                             marker.openPopup();
                             markerFound = true;
-                        } catch (e) {
-                            console.log("Could not open popup by location:", e);
-                        }
+                        } catch (e) {}
                     }
                 });
             }
-
-            if (!markerFound) {
-                console.log("Could not find the marker for this show, but zoomed to its location!");
-            }
         }
 
-        // Try to find and open the marker
         findAndOpenMarker();
 
-        // If the marker wasn't found after the first attempt, try again after a short delay
-        // (this helps if the cluster needs time to update after zooming)
         setTimeout(() => {
-            // Check if a popup is already open
             if (!mymap.getPopup() || !mymap.getPopup().isOpen()) {
-                // Try one more time with a different approach
                 allMarkers.forEach((marker) => {
                     const latLng = marker.getLatLng();
-                    // Check by location with a slightly larger tolerance
                     if (
                         Math.abs(latLng.lat - selectedShow.Latitude) < 0.005 &&
                         Math.abs(latLng.lng - selectedShow.Longitude) < 0.005
                     ) {
                         try {
-                            // Force the map to zoom to the exact location
                             mymap.flyTo([selectedShow.Latitude, selectedShow.Longitude], 18, {
                                 duration: 0.5,
                                 easeLinearity: 0.25
@@ -1056,13 +1159,9 @@ async function findRandomStory() {
                             setTimeout(() => {
                                 try {
                                     marker.openPopup();
-                                } catch (e) {
-                                    console.log("Final attempt failed:", e);
-                                }
+                                } catch (e) {}
                             }, 600);
-                        } catch (e) {
-                            console.log("Final attempt failed:", e);
-                        }
+                        } catch (e) {}
                     }
                 });
             }
@@ -1070,7 +1169,9 @@ async function findRandomStory() {
     }, 1200);
 }
 
-// ========== FILTERING FUNCTIONS ========== //
+// ============================================================
+// SHOW DATA LOADING
+// ============================================================
 function loadShowsData() {
     Object.keys(iconMap).forEach((year) => {
         markersByYear[year] = [];
@@ -1079,7 +1180,6 @@ function loadShowsData() {
     fetch("UQ_shows.json")
         .then((response) => response.json())
         .then((data) => {
-            console.log("Shows data loaded:", data.length, "shows");
             window.showsData = data;
             calculateAndDisplayTopCities(data);
 
@@ -1105,10 +1205,7 @@ function loadShowsData() {
                 }
             });
 
-            console.log("Visible years:", Array.from(visibleYears));
             createYearControl();
-
-            // Initialize both layers
             refreshClusterLayer();
             refreshHeatmapLayer();
         })
@@ -1128,9 +1225,11 @@ function createYearControl() {
                 checkbox.type = "checkbox";
                 checkbox.checked = true;
                 checkbox.value = year;
+
                 const colorIndicator = document.createElement("span");
                 colorIndicator.className = `year-color year-${year}`;
                 colorIndicator.style.backgroundColor = yearColors[year];
+
                 const text = document.createTextNode(`${year} (${markersByYear[year].length})`);
 
                 checkbox.addEventListener("change", function () {
@@ -1147,7 +1246,6 @@ function createYearControl() {
 }
 
 function updateVisibleMarkers() {
-    // Refresh both layers with new year selection
     refreshClusterLayer();
     refreshHeatmapLayer();
 
@@ -1157,7 +1255,9 @@ function updateVisibleMarkers() {
     }
 }
 
-// ========== STATS PANEL ========== //
+// ============================================================
+// STATS PANEL (Top 5 Cities)
+// ============================================================
 function calculateAndDisplayTopCities(showsData) {
     const cityCount = {};
     showsData.forEach((show) => {
@@ -1187,7 +1287,9 @@ function calculateAndDisplayTopCities(showsData) {
     }
 }
 
-// ========== PHOTO GALLERY FUNCTIONS ========== //
+// ============================================================
+// PHOTO GALLERY
+// ============================================================
 let currentGalleryID = null;
 let currentPhotoInfo = [];
 let currentPhotoIndex = 0;
@@ -1283,7 +1385,9 @@ function displayCurrentPhoto() {
     document.getElementById("next-photo").disabled = currentPhotoIndex === currentPhotoInfo.length - 1;
 }
 
-// ========== STORIES GALLERY FUNCTIONS ========== //
+// ============================================================
+// STORIES GALLERY
+// ============================================================
 let currentStoriesID = null;
 let currentStories = [];
 let currentStoryIndex = 0;
@@ -1397,7 +1501,9 @@ function displayCurrentStory() {
     document.getElementById("next-story").disabled = currentStoryIndex === currentStories.length - 1;
 }
 
-// ========== MAIN DOMContentLoaded EVENT LISTENER ========== //
+// ============================================================
+// DOM READY
+// ============================================================
 document.addEventListener("DOMContentLoaded", function () {
     let currentPage = 1;
     const totalPages = 3;
@@ -1427,9 +1533,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     showPage(1);
 
-    // Load all data
     loadShowsData();
-    // Load photos and stories in the background
     loadAllPhotos().then(() => console.log("Photos loaded"));
     loadAllStories().then(() => console.log("Stories loaded"));
 
@@ -1454,7 +1558,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Collapsible stats panel
+    // Stats panel collapse
     const statsControl = document.getElementById("stats-control");
     const statsToggle = document.getElementById("minimize-stats");
     const statsHeader = document.getElementById("stats-header");
@@ -1496,19 +1600,18 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Business Card Modal listeners
+    // Business card modal
     const businessModal = document.getElementById("business-card-modal");
     const businessClose = document.querySelector(".close-business-card");
-    
+
     if (businessClose) {
-        businessClose.addEventListener("click", function() {
+        businessClose.addEventListener("click", function () {
             if (businessModal) businessModal.style.display = "none";
         });
     }
     if (businessModal) {
-        businessModal.addEventListener("click", function(e) {
+        businessModal.addEventListener("click", function (e) {
             if (e.target === businessModal) businessModal.style.display = "none";
         });
     }
-
 });
